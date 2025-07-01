@@ -1,44 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Image, Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { jwtDecode } from "jwt-decode";
 import Bottom from "../../assets/svgs/bottom_right.svg";
-import TopLeftSVG from "./TopLeft";
-import { IDScreenStyles, large, medium, small } from "./styles";
+import { UserContext } from "../../context/UserContext";
+import BloodType from "./BloodType";
 import { QRCodeView } from "./QRCode";
+import TopLeftSVG from "./TopLeft";
+import { large, medium, small } from "./styles";
 
-interface NavigationProps {
-  navigation: any;
-  route?: any;
-}
-
-export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
-  const [styles, setStyles] = useState<IDScreenStyles | null>(null);
+export const IDScreen: React.FC = () => {
   const { width, height } = useWindowDimensions();
-  const [info, setInfo] = useState<any>();
+  const styles =
+    width > 440 && height > 870
+      ? large
+      : width > 370 && height > 700
+      ? medium
+      : small;
 
-  useEffect(() => {
-    fetch(`http://192.168.52.65:8080/api/v1/person/12998174`)
-      .then((res) => res.json())
-      .then((json) => setInfo(json))
-      .catch((err) => setInfo(err.message));
-  }, []);
-
-  useEffect(() => {
-    if (width > 440 && height > 870) {
-      setStyles(large);
-    } else if (width > 370 && height > 700) {
-      setStyles(medium);
-    } else {
-      setStyles(small);
-    }
-  }, []);
+  const {
+    userData: { currentUser, token },
+  } = useContext(UserContext);
 
   if (styles === null) {
     return <></>;
   }
-  if (!info) {
-    return <Text>Cargando</Text>;
+  if (!currentUser) {
+    return <Text>:(</Text>;
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -55,8 +44,8 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
           borderRadius={styles.user.borderRadius}
         />
         <View style={styles.info}>
-          <Text style={styles.name}>{info.name}</Text>
-          <Text style={styles.lastname}>{info.lastName}</Text>
+          <Text style={styles.name}>{currentUser.name}</Text>
+          <Text style={styles.lastname}>{currentUser.surname}</Text>
           <View style={styles.table}>
             <View style={styles.tableHeader}>
               <Text
@@ -80,14 +69,20 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
                   ...styles.tableDesc,
                 }}
               >
-                {info.typeIdentification}. {info.identification}
+                {currentUser.idNumber}
               </Text>
-              <Text style={{ width: styles.rhCol.width, ...styles.tableDesc }}>
-                {info.rh}
-              </Text>
+              <BloodType
+                style={{ width: styles.rhCol.width, ...styles.tableDesc }}
+                id={currentUser.idNumber}
+                token={token}
+              />
             </View>
           </View>
-          <QRCodeView identification={info.identification} paddingTop={styles.qrCodeView.paddingTop} size={styles.qrCodeView.size}/>
+          <QRCodeView
+            identification={currentUser.idNumber}
+            paddingTop={styles.qrCodeView.paddingTop}
+            size={styles.qrCodeView.size}
+          />
         </View>
         <View style={styles.bottom}>
           <Bottom width={"100%"} height={"100%"} />

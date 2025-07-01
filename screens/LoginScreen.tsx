@@ -1,8 +1,9 @@
 "use client";
 
 import { Image } from "expo-image";
+import { jwtDecode } from "jwt-decode";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -18,6 +19,9 @@ import {
 import { CustomButton } from "../components/CustomButton";
 import { CustomInput } from "../components/CustomInput";
 import { Colors } from "../constants/Colors";
+import { UserContext } from "../context/UserContext";
+import { login } from "../services/login";
+import { encodePassword } from "../util/cryp";
 
 interface NavigationProps {
   navigation: any;
@@ -30,6 +34,8 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const { setUserData } = useContext(UserContext);
+
   const { height } = useWindowDimensions();
 
   useEffect(() => {
@@ -38,11 +44,22 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
     }
   }, []);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert("Error", "Por favor completa todos los campos");
       return;
     }
+
+    const res = await login(email, encodePassword(password) || "");
+    // setAux(res);
+    if (!res) {
+      Alert.alert("Error", "Credenciales incorrectas");
+      return;
+    }
+
+    const currentUser = jwtDecode(res); // Validate JWT structure
+
+    setUserData({ currentUser, token: JSON.parse(res).token });
 
     // Simulate login
     navigation.navigate("Welcome");

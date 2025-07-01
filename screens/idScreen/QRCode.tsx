@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { DimensionValue, Text, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
+import { UserContext } from "../../context/UserContext";
 
 interface IQRCodeView {
   identification: string;
@@ -9,16 +10,23 @@ interface IQRCodeView {
 }
 export function QRCodeView({ identification, paddingTop, size }: IQRCodeView) {
   const [info, setInfo] = useState<any>();
+  const {
+    userData: { token },
+  } = useContext(UserContext);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch(`http://192.168.52.65:8080/api/v1/armatura/${identification}`, {
+      fetch(`${process.env.EXPO_PUBLIC_API_URL}/armatura/${identification}`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       })
         .then((res) => res.json())
         .then((json) => setInfo(json))
         .catch((err) => setInfo(err.message));
-    }, 10000000);
+    }, 100000000000000);
 
     return () => clearInterval(interval);
   }, []);
