@@ -14,7 +14,7 @@ export async function fetchIdScreenData({ idNumber, token, setUserData, navigati
 }
 
 async function fetchArmaturaData(idNumber: string, token: string, setUserData: (data: any) => void, navigation: any) {
-  fetch(`http://192.168.52.65:8080/unid/armatura/${idNumber}/data`, {
+  fetch(`${Constants.expoConfig?.extra?.apiUrl || "http://192.168.52.65:8080/unid"}/armatura/${idNumber}/data`, {
     headers: {
       Authorization: `Bearer ${token}`,
     }
@@ -40,8 +40,7 @@ async function fetchArmaturaData(idNumber: string, token: string, setUserData: (
 }
 
 async function fetchBloodType(idNumber: string, token: string, setUserData: (data: any) => void) {
-  fetch(
-    `http://192.168.52.65:8080/unid/simca/userBlood/${idNumber}`,
+  fetch(`${Constants.expoConfig?.extra?.apiUrl || "http://192.168.52.65:8080/unid"}/simca/userBlood/${idNumber}`,
     {
       method: "GET",
       headers: {

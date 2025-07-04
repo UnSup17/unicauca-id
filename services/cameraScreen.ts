@@ -11,8 +11,7 @@ interface ITryPostProfilePhoto {
 export async function tryPostProfilePhoto({ photo, armaturaData, token, setUserData }: ITryPostProfilePhoto) {
   const data = JSON.parse(armaturaData);
   data.personPhoto = photo.base64;
-  return fetch(
-    `${Constants.expoConfig?.extra?.apiUrl || "http://192.168.52.65:8080/unid"}/armatura/update`,
+  fetch(`${Constants.expoConfig?.extra?.apiUrl || "http://192.168.52.65:8080/unid"}/armatura/update`,
     {
       method: "POST",
       headers: {
