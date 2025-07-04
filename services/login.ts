@@ -1,6 +1,7 @@
+import Constants from 'expo-constants';
+
 export async function login(username: string, password: string) {
-  const url = process.env.EXPO_PUBLIC_API_URL;
-  const res = fetch(`${url}/login`, {
+  const res = fetch(`${Constants.expoConfig?.extra?.apiUrl || "https://backend.unicauca.edu.co/unid"}/login`, {
     method: 'POST',
     body: JSON.stringify({
       username,

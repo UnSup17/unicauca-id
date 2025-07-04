@@ -20,6 +20,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.unicauca.id",
+      "versionCode": 1,
       "permissions": [
         "CAMERA",
         "android.permission.CAMERA",

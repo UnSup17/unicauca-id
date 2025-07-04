@@ -19,9 +19,11 @@ import {
 import { CustomButton } from "../components/CustomButton";
 import { CustomInput } from "../components/CustomInput";
 import { Colors } from "../constants/Colors";
+import { LoadingContext } from "../context/LoadingContext";
 import { UserContext } from "../context/UserContext";
 import { login } from "../services/login";
 import { encodePassword } from "../util/cryp";
+import { fetchIdScreenData } from "../services/idScreen";
 
 interface NavigationProps {
   navigation: any;
@@ -35,6 +37,7 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
   const [password, setPassword] = useState("");
 
   const { setUserData } = useContext(UserContext);
+  const { loading, setLoading } = useContext(LoadingContext);
 
   const { height } = useWindowDimensions();
 
@@ -45,6 +48,8 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
   }, []);
 
   const handleLogin = async () => {
+    setLoading(true);
+
     if (!email || !password) {
       Alert.alert("Error", "Por favor completa todos los campos");
       return;
@@ -54,13 +59,22 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
     // setAux(res);
     if (!res) {
       Alert.alert("Error", "Credenciales incorrectas");
+      setLoading(false);
       return;
     }
 
     const currentUser = jwtDecode(res); // Validate JWT structure
+    const token = JSON.parse(res).token; // Extract token from the response
 
-    setUserData({ currentUser, token: JSON.parse(res).token });
+    setUserData({ currentUser, token });
 
+    fetchIdScreenData({
+      idNumber: (currentUser as any).idNumber,
+      token,
+      setUserData,
+    });
+
+    setLoading(false);
     // Simulate login
     navigation.navigate("Welcome");
   };
@@ -118,6 +132,7 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
               <CustomButton
                 title="Iniciar sesión"
                 onPress={handleLogin}
+                disabled={loading}
                 size={height < 800 ? "small" : "normal"}
                 style={styles.loginButton}
               />

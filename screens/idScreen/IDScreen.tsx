@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Image, Text, useWindowDimensions, View } from "react-native";
+import React, { useContext } from "react";
+import { Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { jwtDecode } from "jwt-decode";
 import Bottom from "../../assets/svgs/bottom_right.svg";
 import { UserContext } from "../../context/UserContext";
 import BloodType from "./BloodType";
+import PP from "./PP";
 import { QRCodeView } from "./QRCode";
 import TopLeftSVG from "./TopLeft";
 import { large, medium, small } from "./styles";
@@ -35,14 +35,7 @@ export const IDScreen: React.FC = () => {
         <View style={styles.upper}>
           <TopLeftSVG />
         </View>
-        <Image
-          source={require("../../assets/images/user.jpg")}
-          style={{ top: styles.user.top }}
-          height={styles.user.height}
-          width={styles.user.width}
-          resizeMode="stretch"
-          borderRadius={styles.user.borderRadius}
-        />
+        <PP styles={styles}></PP>
         <View style={styles.info}>
           <Text style={styles.name}>{currentUser.name}</Text>
           <Text style={styles.lastname}>{currentUser.surname}</Text>
@@ -73,8 +66,6 @@ export const IDScreen: React.FC = () => {
               </Text>
               <BloodType
                 style={{ width: styles.rhCol.width, ...styles.tableDesc }}
-                id={currentUser.idNumber}
-                token={token}
               />
             </View>
           </View>
