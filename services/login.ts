@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 
 export async function login(username: string, password: string) {
-  const res = fetch(`${Constants.expoConfig?.extra?.apiUrl || "https://backend.unicauca.edu.co/unid"}/login`, {
+  const res = fetch(`${Constants.expoConfig?.extra?.apiUrl || "http://192.168.52.65:8080/unid"}/login`, {
     method: 'POST',
     body: JSON.stringify({
       username,

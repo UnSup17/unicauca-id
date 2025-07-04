@@ -5,12 +5,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Bottom from "../../assets/svgs/bottom_right.svg";
 import { UserContext } from "../../context/UserContext";
 import BloodType from "./BloodType";
-import PP from "./PP";
+import PersonPhoto from "./PersonPhoto";
 import { QRCodeView } from "./QRCode";
 import TopLeftSVG from "./TopLeft";
 import { large, medium, small } from "./styles";
 
-export const IDScreen: React.FC = () => {
+interface NavigationProps {
+  navigation: any;
+  route?: any;
+}
+
+export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
   const styles =
     width > 440 && height > 870
@@ -19,14 +24,13 @@ export const IDScreen: React.FC = () => {
       ? medium
       : small;
 
-  const {
-    userData: { currentUser, token },
-  } = useContext(UserContext);
+  const { userData } = useContext(UserContext);
 
   if (styles === null) {
     return <></>;
   }
-  if (!currentUser) {
+
+  if (!userData || !userData?.currentUser) {
     return <Text>:(</Text>;
   }
   return (
@@ -35,10 +39,10 @@ export const IDScreen: React.FC = () => {
         <View style={styles.upper}>
           <TopLeftSVG />
         </View>
-        <PP styles={styles}></PP>
+        <PersonPhoto styles={styles}></PersonPhoto>
         <View style={styles.info}>
-          <Text style={styles.name}>{currentUser.name}</Text>
-          <Text style={styles.lastname}>{currentUser.surname}</Text>
+          <Text style={styles.name}>{userData.currentUser.name}</Text>
+          <Text style={styles.lastname}>{userData.currentUser.surname}</Text>
           <View style={styles.table}>
             <View style={styles.tableHeader}>
               <Text
@@ -62,7 +66,7 @@ export const IDScreen: React.FC = () => {
                   ...styles.tableDesc,
                 }}
               >
-                {currentUser.idNumber}
+                {userData.currentUser.idNumber}
               </Text>
               <BloodType
                 style={{ width: styles.rhCol.width, ...styles.tableDesc }}
@@ -70,9 +74,10 @@ export const IDScreen: React.FC = () => {
             </View>
           </View>
           <QRCodeView
-            identification={currentUser.idNumber}
+            identification={userData.currentUser.idNumber}
             paddingTop={styles.qrCodeView.paddingTop}
             size={styles.qrCodeView.size}
+            navigation={navigation}
           />
         </View>
         <View style={styles.bottom}>

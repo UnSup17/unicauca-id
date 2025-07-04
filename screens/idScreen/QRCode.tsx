@@ -1,6 +1,6 @@
 import Constants from "expo-constants";
 import { useContext, useEffect, useState } from "react";
-import { DimensionValue, View } from "react-native";
+import { DimensionValue, View, Text, Alert } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { UserContext } from "../../context/UserContext";
 
@@ -8,28 +8,45 @@ interface IQRCodeView {
   identification: string;
   paddingTop: DimensionValue;
   size: number;
+  navigation: any;
 }
-export function QRCodeView({ identification, paddingTop, size }: IQRCodeView) {
+export function QRCodeView({
+  identification,
+  paddingTop,
+  size,
+  navigation,
+}: IQRCodeView) {
   const [info, setInfo] = useState<any>();
   const {
     userData: { token },
+    setUserData,
   } = useContext(UserContext);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = () => {
       fetch(
         `${
           Constants.expoConfig?.extra?.apiUrl ||
-          "https://backend.unicauca.edu.co/unid"
-        }/armatura/${identification}`,
+          "http://192.168.52.65:8080/unid"
+        }/armatura/${identification}/qr`,
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
       )
+        .then((res) => {
+          if (!res.ok) {
+            Alert.alert(
+              "Sesión expirada",
+              "Por favor inicia sesión nuevamente"
+            );
+            setUserData(null);
+            navigation.navigate("Login");
+          }
+          return res;
+        })
         .then((res) => res.json())
         .then((json) => setInfo(json))
         .catch((err) => setInfo(err.message));
@@ -38,7 +55,7 @@ export function QRCodeView({ identification, paddingTop, size }: IQRCodeView) {
     fetchData();
     const interval = setInterval(() => {
       fetchData();
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, []);

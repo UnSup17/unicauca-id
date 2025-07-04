@@ -1,9 +1,8 @@
 "use client";
 
-import { Ionicons } from "@expo/vector-icons";
-import { CameraView, useCameraPermissions, type CameraType } from "expo-camera";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import type React from "react";
-import { useRef, useState } from "react";
+import { useContext, useRef } from "react";
 import {
   Alert,
   Dimensions,
@@ -14,6 +13,8 @@ import {
   View,
 } from "react-native";
 import { Colors } from "../constants/Colors";
+import { tryPostProfilePhoto } from "../services/cameraScreen";
+import { UserContext } from "../context/UserContext";
 
 interface NavigationProps {
   navigation: any;
@@ -21,9 +22,16 @@ interface NavigationProps {
 }
 
 export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
-  const [facing, setFacing] = useState<CameraType>("front");
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView>(null);
+
+  const {
+    userData: {
+      currentUser: { data },
+      token,
+    },
+    setUserData,
+  } = useContext(UserContext);
 
   if (!permission) {
     return <View />;
@@ -42,23 +50,27 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
     );
   }
 
-  const toggleCameraFacing = () => {
-    setFacing((current) => (current === "back" ? "front" : "back"));
-  };
-
   const takePicture = async () => {
     if (cameraRef.current) {
       try {
         const photo = await cameraRef.current.takePictureAsync();
+        if (!photo || !photo.base64) {
+          Alert.alert("Error", "No se pudo tomar la foto");
+          return;
+        }
+
+        tryPostProfilePhoto({
+          photo,
+          armaturaData: data,
+          token,
+          setUserData,
+        });
+
         navigation.navigate("ID");
       } catch (error) {
         Alert.alert("Error", "No se pudo tomar la foto");
       }
     }
-  };
-
-  const goBack = () => {
-    navigation.goBack();
   };
 
   return (
@@ -67,7 +79,7 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
       <View style={styles.cameraContainer}>
         <CameraView
           style={styles.camera}
-          facing={facing}
+          facing={"front"}
           ref={cameraRef}
           ratio="1:1"
         />
@@ -138,7 +150,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 125,
     borderBottomRightRadius: 125,
     borderWidth: 4,
-    marginHorizontal: Dimensions.get("screen").width/4,
+    marginHorizontal: Dimensions.get("screen").width / 4,
     borderColor: Colors.lightGray,
     justifyContent: "center",
     backgroundColor: "transparent",

@@ -33,8 +33,8 @@ interface NavigationProps {
 export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
   const [styles, setStyles] = useState<any>(normalSizes);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("andrescd");
+  const [password, setPassword] = useState("123456789");
 
   const { setUserData } = useContext(UserContext);
   const { loading, setLoading } = useContext(LoadingContext);
@@ -68,15 +68,13 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
 
     setUserData({ currentUser, token });
 
-    fetchIdScreenData({
+    await fetchIdScreenData({
       idNumber: (currentUser as any).idNumber,
       token,
       setUserData,
+      navigation,
     });
-
     setLoading(false);
-    // Simulate login
-    navigation.navigate("Welcome");
   };
 
   return (

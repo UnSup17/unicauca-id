@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { Image } from "react-native";
 import { UserContext } from "../../context/UserContext";
 
-interface IPP {
+interface IPersonPhoto {
   styles: {
     user: {
       top: number;
@@ -12,13 +12,15 @@ interface IPP {
     };
   };
 }
-export default function PP({ styles }: IPP) {
-  const {
-    userData: { currentUser },
-  } = useContext(UserContext);
+export default function PersonPhoto({ styles }: IPersonPhoto) {
+  const { userData } = useContext(UserContext);
+  if (!userData || !userData.currentUser.data) {
+    return <></>;
+  }
+  const personPhoto = userData.currentUser.data.personPhoto;
   return (
     <Image
-      source={{ uri: currentUser.pp }}
+      source={{ uri: "data:image/jpeg;base64," + personPhoto }}
       style={{ top: styles.user.top }}
       height={styles.user.height}
       width={styles.user.width}
