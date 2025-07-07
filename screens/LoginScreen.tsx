@@ -259,6 +259,8 @@ const smallSizes = StyleSheet.create({
   },
   mainView: {
     flex: 1,
+    justifyContent: "center",
+    height: Dimensions.get("screen").height,
   },
   header: {
     alignItems: "center",
@@ -266,8 +268,8 @@ const smallSizes = StyleSheet.create({
     paddingBottom: 20,
   },
   imageHeader: {
-    width: 70,
-    height: 130,
+    width: 150,
+    height: 150,
   },
   title: {
     fontSize: 24,
@@ -363,6 +365,7 @@ const normalSizes = StyleSheet.create({
   },
   mainView: {
     flex: 1,
+    justifyContent: "center",
     height: Dimensions.get("screen").height,
   },
   header: {
