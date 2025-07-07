@@ -1,5 +1,11 @@
-import React, { useContext } from "react";
-import { Text, useWindowDimensions, View } from "react-native";
+import React, { useContext, useEffect } from "react";
+import {
+  Alert,
+  BackHandler,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Bottom from "../../assets/svgs/bottom_right.svg";
@@ -24,7 +30,30 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
       ? medium
       : small;
 
-  const { userData } = useContext(UserContext);
+  const { userData, setUserData } = useContext(UserContext);
+
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert("Salir", "¿Cerrar sesión?", [
+        { text: "No", style: "cancel", onPress: () => null },
+        {
+          text: "Sí",
+          onPress: () => {
+            setUserData(null);
+            navigation.navigate("Login");
+          },
+        },
+      ]);
+      return true; // Bloquea la acción por defecto
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   if (styles === null) {
     return <></>;

@@ -6,6 +6,7 @@ import type React from "react";
 import { useContext, useEffect, useState } from "react";
 import {
   Alert,
+  BackHandler,
   Dimensions,
   KeyboardAvoidingView,
   Platform,
@@ -33,13 +34,33 @@ interface NavigationProps {
 export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
   const [styles, setStyles] = useState<any>(normalSizes);
 
-  const [email, setEmail] = useState("andrescd");
-  const [password, setPassword] = useState("123456789");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const { setUserData } = useContext(UserContext);
   const { loading, setLoading } = useContext(LoadingContext);
 
   const { height } = useWindowDimensions();
+
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert("Salir", "¿Quieres cerrar la aplicación?", [
+        { text: "No", style: "cancel", onPress: () => null },
+        {
+          text: "Sí",
+          onPress: () => BackHandler.exitApp(),
+        },
+      ]);
+      return true; // Bloquea la acción por defecto
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   useEffect(() => {
     if (height < 800) {
@@ -50,12 +71,12 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
   const handleLogin = async () => {
     setLoading(true);
 
-    if (!email || !password) {
+    if (!username || !password) {
       Alert.alert("Error", "Por favor completa todos los campos");
       return;
     }
 
-    const res = await login(email, encodePassword(password) || "");
+    const res = await login(username, encodePassword(password) || "");
     // setAux(res);
     if (!res) {
       Alert.alert("Error", "Credenciales incorrectas");
@@ -88,27 +109,26 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
           <View style={styles.mainView}>
             <View style={styles.header}>
               <Image
-                source={require("../assets/images/card_login.png")}
+                source={require("../assets/icon.png")}
                 style={{
                   width: styles.imageHeader.width,
                   height: styles.imageHeader.height,
                 }}
                 contentFit="contain"
               />
-              <Text style={styles.title}>UniCauca ID</Text>
             </View>
 
             {/* Form */}
             <View style={styles.form}>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>
-                  Correo Institucional <Text style={styles.required}>*</Text>
+                  Usuario Institucional <Text style={styles.required}>*</Text>
                 </Text>
                 <CustomInput
-                  placeholder="Correo institucional"
+                  placeholder="Usuario institucional"
                   size={height < 800 ? "small" : "normal"}
-                  value={email}
-                  onChangeText={setEmail}
+                  value={username}
+                  onChangeText={setUsername}
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
@@ -134,7 +154,7 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
                 size={height < 800 ? "small" : "normal"}
                 style={styles.loginButton}
               />
-
+              {/* 
               <View style={styles.separator}>
                 <Text style={styles.label} />
               </View>
@@ -145,7 +165,7 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
                   style={{ width: 218, height: 91 }}
                   contentFit="contain"
                 />
-              </View>
+              </View> */}
             </View>
 
             <View style={styles.colorStripe}>
@@ -346,7 +366,7 @@ const normalSizes = StyleSheet.create({
     paddingBottom: 60,
   },
   imageHeader: {
-    width: 100,
+    width: 200,
     height: 200,
   },
   title: {

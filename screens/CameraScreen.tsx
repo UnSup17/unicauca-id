@@ -2,9 +2,10 @@
 
 import { CameraView, useCameraPermissions } from "expo-camera";
 import type React from "react";
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import {
   Alert,
+  BackHandler,
   Dimensions,
   SafeAreaView,
   StyleSheet,
@@ -15,6 +16,7 @@ import {
 import { Colors } from "../constants/Colors";
 import { tryPostProfilePhoto } from "../services/cameraScreen";
 import { UserContext } from "../context/UserContext";
+import { LoadingContext } from "../context/LoadingContext";
 
 interface NavigationProps {
   navigation: any;
@@ -22,6 +24,7 @@ interface NavigationProps {
 }
 
 export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
+  const { setLoading } = useContext(LoadingContext);
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView>(null);
 
@@ -32,6 +35,21 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
     },
     setUserData,
   } = useContext(UserContext);
+
+  useEffect(() => {
+    const backAction = () => {
+      // Retorna true para bloquear
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    // Limpia el listener al desmontar
+    return () => backHandler.remove();
+  }, []);
 
   if (!permission) {
     return <View />;
@@ -51,6 +69,7 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
   }
 
   const takePicture = async () => {
+    setLoading(true);
     if (cameraRef.current) {
       try {
         const photo = await cameraRef.current.takePictureAsync({
@@ -63,12 +82,14 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
           token,
           setUserData,
         });
-
+        setLoading(false);
         if (res) navigation.navigate("ID");
       } catch (error) {
+        setLoading(false);
         Alert.alert("Error", error + "");
       }
     }
+    setLoading(false);
   };
 
   return (

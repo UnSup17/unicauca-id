@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import type React from "react";
 import {
+  BackHandler,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -11,6 +12,7 @@ import {
 } from "react-native";
 import { CustomButton } from "../components/CustomButton";
 import { Colors } from "../constants/Colors";
+import { useEffect } from "react";
 
 interface NavigationProps {
   navigation: any;
@@ -19,6 +21,21 @@ interface NavigationProps {
 
 export const WelcomeScreen: React.FC<NavigationProps> = ({ navigation }) => {
   const { height } = useWindowDimensions();
+
+  useEffect(() => {
+    const backAction = () => {
+      // Retorna true para bloquear
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    // Limpia el listener al desmontar
+    return () => backHandler.remove();
+  }, []);
 
   const handleTakePhoto = () => {
     navigation.navigate("Camera");
