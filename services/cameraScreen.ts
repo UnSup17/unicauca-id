@@ -1,14 +1,14 @@
 import { CameraCapturedPicture } from "expo-camera";
+import { Alert } from "react-native";
 
 interface ITryPostProfilePhoto {
   photo: CameraCapturedPicture,
-  armaturaData: string,
+  data: any,
   token: string,
   setUserData: (data: any) => void
 }
 
-export async function tryPostProfilePhoto({ photo, armaturaData, token, setUserData }: ITryPostProfilePhoto) {
-  const data = JSON.parse(armaturaData);
+export async function tryPostProfilePhoto({ photo, data, token, setUserData }: ITryPostProfilePhoto) {
   data.personPhoto = photo.base64;
   return fetch(`https://backend.unicauca.edu.co/unid/armatura/update`,
     {
@@ -30,6 +30,9 @@ export async function tryPostProfilePhoto({ photo, armaturaData, token, setUserD
       }));
       return true;
     })
-    .catch(() => false);
+    .catch((err) => {
+      Alert.alert("Error", err)
+      return false;
+    });
 
 }

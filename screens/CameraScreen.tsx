@@ -56,22 +56,18 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
         const photo = await cameraRef.current.takePictureAsync({
           base64: true,
         });
-        if (!photo || !photo.base64) {
-          Alert.alert("Error", "No se pudo tomar la foto");
-          return;
-        }
 
         const res = await tryPostProfilePhoto({
           photo,
-          armaturaData: data,
+          data,
           token,
           setUserData,
         });
 
         if (res) navigation.navigate("ID");
-        else Alert.alert("Reintenta con una foto nueva, busca un lugar claro, y retirate accesorios del rostro.");
+        // else Alert.alert("Reintenta con una foto nueva, busca un lugar claro, y retirate accesorios del rostro.");
       } catch (error) {
-        Alert.alert("Error", "No se pudo tomar la foto");
+        Alert.alert("Error", "Catcheado en takePicture: " + error);
       }
     }
   };
@@ -79,6 +75,7 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Camera View */}
+      <Text>{JSON.stringify(data)}</Text>
       <View style={styles.cameraContainer}>
         <CameraView
           style={styles.camera}
