@@ -1,5 +1,4 @@
 import { CameraCapturedPicture } from "expo-camera";
-import Constants from "expo-constants";
 
 interface ITryPostProfilePhoto {
   photo: CameraCapturedPicture,
@@ -11,7 +10,7 @@ interface ITryPostProfilePhoto {
 export async function tryPostProfilePhoto({ photo, armaturaData, token, setUserData }: ITryPostProfilePhoto) {
   const data = JSON.parse(armaturaData);
   data.personPhoto = photo.base64;
-  fetch(`${Constants.expoConfig?.extra?.apiUrl || "http://192.168.52.65:8080/unid"}/armatura/update`,
+  return fetch(`https://backend.unicauca.edu.co/unid/armatura/update`,
     {
       method: "POST",
       headers: {
@@ -29,7 +28,8 @@ export async function tryPostProfilePhoto({ photo, armaturaData, token, setUserD
           data: json.data
         }
       }));
+      return true;
     })
-    .catch((err) => console.error("Error uploading photo:", err));
+    .catch(() => false);
 
 }

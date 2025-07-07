@@ -1,6 +1,5 @@
-import Constants from "expo-constants";
 import { useContext, useEffect, useState } from "react";
-import { DimensionValue, View, Text, Alert } from "react-native";
+import { Alert, DimensionValue, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { UserContext } from "../../context/UserContext";
 
@@ -25,10 +24,7 @@ export function QRCodeView({
   useEffect(() => {
     const fetchData = () => {
       fetch(
-        `${
-          Constants.expoConfig?.extra?.apiUrl ||
-          "http://192.168.52.65:8080/unid"
-        }/armatura/${identification}/qr`,
+        `https://backend.unicauca.edu.co/unid/armatura/${identification}/qr`,
         {
           method: "POST",
           headers: {

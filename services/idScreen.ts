@@ -1,5 +1,3 @@
-import Constants from 'expo-constants';
-
 interface IFetchIdScreenData {
   idNumber: string;
   token: string;
@@ -14,7 +12,7 @@ export async function fetchIdScreenData({ idNumber, token, setUserData, navigati
 }
 
 async function fetchArmaturaData(idNumber: string, token: string, setUserData: (data: any) => void, navigation: any) {
-  fetch(`${Constants.expoConfig?.extra?.apiUrl || "http://192.168.52.65:8080/unid"}/armatura/${idNumber}/data`, {
+  fetch(`https://backend.unicauca.edu.co/unid/armatura/${idNumber}/data`, {
     headers: {
       Authorization: `Bearer ${token}`,
     }
@@ -40,7 +38,7 @@ async function fetchArmaturaData(idNumber: string, token: string, setUserData: (
 }
 
 async function fetchBloodType(idNumber: string, token: string, setUserData: (data: any) => void) {
-  fetch(`${Constants.expoConfig?.extra?.apiUrl || "http://192.168.52.65:8080/unid"}/simca/userBlood/${idNumber}`,
+  fetch(`https://backend.unicauca.edu.co/unid/simca/userBlood/${idNumber}`,
     {
       method: "GET",
       headers: {

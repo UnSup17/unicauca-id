@@ -1,5 +1,4 @@
-import Constants from "expo-constants";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { Text } from "react-native";
 import { UserContext } from "../../context/UserContext";
 
