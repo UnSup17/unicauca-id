@@ -65,9 +65,8 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
         });
 
         if (res) navigation.navigate("ID");
-        // else Alert.alert("Reintenta con una foto nueva, busca un lugar claro, y retirate accesorios del rostro.");
       } catch (error) {
-        Alert.alert("Error", "Catcheado en takePicture: " + error);
+        Alert.alert("Error", error + "");
       }
     }
   };
@@ -75,7 +74,6 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Camera View */}
-      <Text>{JSON.stringify(data)}</Text>
       <View style={styles.cameraContainer}>
         <CameraView
           style={styles.camera}

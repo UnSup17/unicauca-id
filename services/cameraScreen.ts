@@ -20,22 +20,14 @@ export async function tryPostProfilePhoto({ photo, data, token, setUserData }: I
     }
   )
     .then((res) => res.json())
-    .then((json) => {
-      if (json.message === "success") {
-        setUserData((prev: any) => ({
-          ...prev,
-          currentUser: {
-            ...prev.currentUser,
-            data
-          }
-        }));
-        return true;
-      }
-      return false;
+    .then(() => {
+      setUserData((prev: any) => ({
+        ...prev,
+        currentUser: {
+          ...prev.currentUser,
+          data
+        }
+      }));
+      return true;
     })
-    .catch((err) => {
-      Alert.alert("Error", err)
-      return false;
-    });
-
 }
