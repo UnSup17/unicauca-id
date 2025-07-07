@@ -25,6 +25,7 @@ import { UserContext } from "../context/UserContext";
 import { login } from "../services/login";
 import { encodePassword } from "../util/cryp";
 import { fetchIdScreenData } from "../services/idScreen";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface NavigationProps {
   navigation: any;
@@ -106,7 +107,12 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Header */}
-          <View style={styles.mainView}>
+          <LinearGradient
+            colors={["#001F54", "#1E3C72", "#2A5298"]}
+            style={{
+              ...styles.mainView,
+            }}
+          >
             <View style={styles.header}>
               <Image
                 source={require("../assets/icon.png")}
@@ -175,7 +181,7 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
               <View style={styles.stripe4} />
               <View style={styles.stripe5} />
             </View>
-          </View>
+          </LinearGradient>
 
           {/* Footer */}
           <View
@@ -250,14 +256,13 @@ const smallSizes = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    backgroundColor: Colors.primary,
   },
   mainView: {
     flex: 1,
   },
   header: {
     alignItems: "center",
-    paddingTop: 40,
+    paddingTop: "20%",
     paddingBottom: 20,
   },
   imageHeader: {
@@ -355,14 +360,14 @@ const normalSizes = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    backgroundColor: Colors.primary,
   },
   mainView: {
+    flex: 1,
     height: Dimensions.get("screen").height,
   },
   header: {
     alignItems: "center",
-    paddingTop: 100,
+    paddingTop: "30%",
     paddingBottom: 60,
   },
   imageHeader: {
