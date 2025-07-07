@@ -25,6 +25,7 @@ import { UserContext } from "../context/UserContext";
 import { login } from "../services/login";
 import { encodePassword } from "../util/cryp";
 import { fetchIdScreenData } from "../services/idScreen";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface NavigationProps {
   navigation: any;
