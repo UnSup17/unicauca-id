@@ -106,7 +106,12 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Header */}
-          <View style={styles.mainView}>
+          <View
+            // colors={["#001F54", "#1E3C72", "#2A5298"]}
+            style={{
+              ...styles.mainView,
+            }}
+          >
             <View style={styles.header}>
               <Image
                 source={require("../assets/icon.png")}
@@ -250,19 +255,20 @@ const smallSizes = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    backgroundColor: Colors.primary,
   },
   mainView: {
     flex: 1,
+    justifyContent: "center",
+    height: Dimensions.get("screen").height,
   },
   header: {
     alignItems: "center",
-    paddingTop: 40,
+    paddingTop: "20%",
     paddingBottom: 20,
   },
   imageHeader: {
-    width: 70,
-    height: 130,
+    width: 150,
+    height: 150,
   },
   title: {
     fontSize: 24,
@@ -355,14 +361,15 @@ const normalSizes = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    backgroundColor: Colors.primary,
   },
   mainView: {
+    flex: 1,
+    justifyContent: "center",
     height: Dimensions.get("screen").height,
   },
   header: {
     alignItems: "center",
-    paddingTop: 100,
+    paddingTop: "30%",
     paddingBottom: 60,
   },
   imageHeader: {
