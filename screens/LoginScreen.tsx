@@ -25,7 +25,6 @@ import { UserContext } from "../context/UserContext";
 import { login } from "../services/login";
 import { encodePassword } from "../util/cryp";
 import { fetchIdScreenData } from "../services/idScreen";
-import { LinearGradient } from "expo-linear-gradient";
 
 interface NavigationProps {
   navigation: any;
@@ -107,12 +106,7 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Header */}
-          <View
-            // colors={["#001F54", "#1E3C72", "#2A5298"]}
-            style={{
-              ...styles.mainView,
-            }}
-          >
+          <View style={styles.mainView}>
             <View style={styles.header}>
               <Image
                 source={require("../assets/icon.png")}
