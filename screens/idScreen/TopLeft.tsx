@@ -1,3 +1,4 @@
+// Usar para decidir que color según el rol :v
 import { useState, useEffect } from "react";
 import Svg, { Path, Circle } from "react-native-svg";
 
