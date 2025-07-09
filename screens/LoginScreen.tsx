@@ -350,6 +350,7 @@ const normalSizes = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor: Colors.primary,
   },
   keyboardView: {
     flex: 1,
