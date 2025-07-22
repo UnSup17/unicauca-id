@@ -1,13 +1,14 @@
 import type React from "react";
+import { useContext } from "react";
 import {
-  TouchableOpacity,
-  Text,
   StyleSheet,
-  type ViewStyle,
+  Text,
   type TextStyle,
-  View,
+  TouchableOpacity,
+  type ViewStyle,
 } from "react-native";
 import { Colors } from "../constants/Colors";
+import { LoadingContext } from "../context/LoadingContext";
 
 interface CustomButtonProps {
   title: string;
@@ -28,6 +29,7 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
   disabled = false,
   children,
 }) => {
+  const { loading } = useContext(LoadingContext);
   const styles = StyleSheet.create({
     button: {
       backgroundColor: Colors.secondary,
@@ -51,7 +53,7 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
     <TouchableOpacity
       style={[styles.button, style, disabled && styles.disabled]}
       onPress={onPress}
-      disabled={disabled}
+      disabled={loading || disabled}
     >
       {children}
       <Text style={[styles.buttonText, textStyle]}>{title}</Text>

@@ -6,13 +6,23 @@ interface IFetchIdScreenData {
 }
 
 export async function fetchIdScreenData({ idNumber, token, setUserData, navigation }: IFetchIdScreenData) {
-  await fetchArmaturaData(idNumber, token, setUserData, navigation);
-  await fetchBloodType(idNumber, token, setUserData);
-
+  try {
+    const [photoExist, _] = await Promise.all([
+      fetchArmaturaData(idNumber, token, setUserData),
+      fetchBloodType(idNumber, token, setUserData)
+    ]);
+    if (photoExist) {
+      navigation.navigate("ID");
+    } else {
+      navigation.navigate("Welcome");
+    }
+  } catch (error) {
+    throw new Error("Error al acceder a los datos para mostrar QR: " + error);
+  }
 }
 
-async function fetchArmaturaData(idNumber: string, token: string, setUserData: (data: any) => void, navigation: any) {
-  fetch(`https://backend.unicauca.edu.co/unid/armatura/${idNumber}/data`, {
+async function fetchArmaturaData(idNumber: string, token: string, setUserData: (data: any) => void) {
+  return fetch(`https://backend.unicauca.edu.co/unid/armatura/${idNumber}/data`, {
     headers: {
       Authorization: `Bearer ${token}`,
     }
@@ -28,11 +38,7 @@ async function fetchArmaturaData(idNumber: string, token: string, setUserData: (
           data
         }
       }))
-      if (data?.personPhoto) {
-        navigation.navigate("ID");
-      } else {
-        navigation.navigate("Welcome");
-      }
+      return data?.personPhoto;
     })
     .catch(() => null);
 }

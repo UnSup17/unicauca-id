@@ -22,9 +22,9 @@ import { CustomInput } from "../components/CustomInput";
 import { Colors } from "../constants/Colors";
 import { LoadingContext } from "../context/LoadingContext";
 import { UserContext } from "../context/UserContext";
+import { fetchIdScreenData } from "../services/idScreen";
 import { login } from "../services/login";
 import { encodePassword } from "../util/cryp";
-import { fetchIdScreenData } from "../services/idScreen";
 
 interface NavigationProps {
   navigation: any;
@@ -38,7 +38,7 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
   const [password, setPassword] = useState("");
 
   const { setUserData } = useContext(UserContext);
-  const { loading, setLoading } = useContext(LoadingContext);
+  const { setLoading } = useContext(LoadingContext);
 
   const { height } = useWindowDimensions();
 
@@ -71,31 +71,32 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
   const handleLogin = async () => {
     setLoading(true);
 
-    if (!username || !password) {
-      Alert.alert("Error", "Por favor completa todos los campos");
-      return;
-    }
+    try {
+      if (!username || !password) {
+        throw new Error("Por favor completa todos los campos");
+      }
 
-    const res = await login(username, encodePassword(password) || "");
-    // setAux(res);
-    if (!res) {
-      Alert.alert("Error", "Credenciales incorrectas");
+      const res = await login(username, encodePassword(password) || "");
+      if (!res) {
+        throw new Error("Credenciales incorrectas");
+      }
+
+      const currentUser = jwtDecode(res);
+      const token = JSON.parse(res).token;
+
+      setUserData({ currentUser, token });
+
+      await fetchIdScreenData({
+        idNumber: (currentUser as any).idNumber,
+        token,
+        setUserData,
+        navigation,
+      });
+    } catch (error: any) {
+      Alert.alert("Login error", error.message);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const currentUser = jwtDecode(res); // Validate JWT structure
-    const token = JSON.parse(res).token; // Extract token from the response
-
-    setUserData({ currentUser, token });
-
-    await fetchIdScreenData({
-      idNumber: (currentUser as any).idNumber,
-      token,
-      setUserData,
-      navigation,
-    });
-    setLoading(false);
   };
 
   return (
@@ -109,7 +110,7 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
           <View style={styles.mainView}>
             <View style={styles.header}>
               <Image
-                source={require("../assets/icon.png")}
+                source={require("../assets/logoLogin.png")}
                 style={{
                   width: styles.imageHeader.width,
                   height: styles.imageHeader.height,
@@ -150,22 +151,9 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
               <CustomButton
                 title="Iniciar sesión"
                 onPress={handleLogin}
-                disabled={loading}
                 size={height < 800 ? "small" : "normal"}
                 style={styles.loginButton}
               />
-              {/* 
-              <View style={styles.separator}>
-                <Text style={styles.label} />
-              </View>
-
-              <View style={styles.logoContainer}>
-                <Image
-                  source={require("../assets/images/unicauca_logo_label_blanco.png")}
-                  style={{ width: 218, height: 91 }}
-                  contentFit="contain"
-                />
-              </View> */}
             </View>
 
             <View style={styles.colorStripe}>
@@ -176,60 +164,6 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
               <View style={styles.stripe5} />
             </View>
           </View>
-
-          {/* Footer */}
-          <View
-            style={{
-              display:
-                Dimensions.get("screen").height < 800 ? "none" : "contents",
-            }}
-          >
-            <View style={styles.footerInfo}>
-              <Text style={styles.footerTitle}>Universidad del Cauca</Text>
-              <Text style={styles.footerSubtitle}>NIT. 891500319-2</Text>
-
-              <Text style={styles.footerText}>Carné Digital</Text>
-              <Text style={styles.footerText}>
-                División de Tecnologías de la Información
-              </Text>
-              <Text style={styles.footerText}>y las Comunicaciones - TIC</Text>
-
-              <View style={styles.separator2} />
-
-              <Text style={styles.footerText}>
-                Vicerrectoría Administrativa
-              </Text>
-              <Text style={styles.footerText}>Versión 1.0.0</Text>
-
-              <View style={styles.separator2} />
-
-              <Text style={styles.footerText}>
-                Sistema de Atención y Soporte - SATIS
-              </Text>
-              <Text style={styles.footerText}>2024</Text>
-
-              <View style={styles.separator2} />
-
-              <Text style={styles.footerText}>
-                Institución con Acreditación de Alta
-              </Text>
-              <Text style={styles.footerText}>
-                Calidad por 8 años Resolución MEN 6218
-              </Text>
-              <Text style={styles.footerText}>
-                de 2019 - Vigilada MinEducación
-              </Text>
-
-              <View style={styles.separator2} />
-
-              <Text style={styles.footerText}>
-                Política de Protección de Datos Personales |
-              </Text>
-              <Text style={styles.footerText}>
-                Política de Seguridad de la Información
-              </Text>
-            </View>
-          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -237,13 +171,9 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
 };
 
 const smallSizes = StyleSheet.create({
-  separator: {
-    height: 1,
-    backgroundColor: Colors.white,
-    marginTop: 20,
-  },
   container: {
     flex: 1,
+    backgroundColor: Colors.primary,
   },
   keyboardView: {
     flex: 1,
@@ -265,12 +195,6 @@ const smallSizes = StyleSheet.create({
     width: 150,
     height: 150,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: Colors.white,
-    textAlign: "center",
-  },
   form: {
     flex: 1,
     paddingHorizontal: 24,
@@ -289,15 +213,6 @@ const smallSizes = StyleSheet.create({
   },
   loginButton: {
     marginTop: 16,
-  },
-  logoContainer: {
-    alignItems: "center",
-    marginVertical: 36,
-  },
-  universityName: {
-    color: Colors.white,
-    fontSize: 18,
-    fontWeight: "600",
   },
   colorStripe: {
     height: 8,
@@ -335,19 +250,6 @@ const smallSizes = StyleSheet.create({
 });
 
 const normalSizes = StyleSheet.create({
-  separator: {
-    height: 1,
-    backgroundColor: Colors.white,
-    marginTop: 40,
-  },
-  separator2: {
-    height: 1,
-    backgroundColor: Colors.gray,
-    marginTop: 16,
-    marginBottom: 16,
-    width: "65%",
-    alignSelf: "center",
-  },
   container: {
     flex: 1,
     backgroundColor: Colors.primary,
@@ -372,12 +274,6 @@ const normalSizes = StyleSheet.create({
     width: 200,
     height: 200,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: Colors.white,
-    textAlign: "center",
-  },
   form: {
     flex: 1,
     paddingHorizontal: 24,
@@ -396,15 +292,6 @@ const normalSizes = StyleSheet.create({
   },
   loginButton: {
     marginTop: 16,
-  },
-  logoContainer: {
-    alignItems: "center",
-    marginVertical: 36,
-  },
-  universityName: {
-    color: Colors.white,
-    fontSize: 18,
-    fontWeight: "600",
   },
   colorStripe: {
     height: 8,
@@ -438,30 +325,5 @@ const normalSizes = StyleSheet.create({
     backgroundColor: "#5A0DBA",
     marginBottom: 20,
     width: "20%",
-  },
-  footerInfo: {
-    backgroundColor: Colors.lightGray,
-    paddingTop: 16,
-    paddingBottom: 32,
-  },
-  footerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: Colors.gray,
-    textAlign: "center",
-    marginTop: 8,
-  },
-  footerSubtitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: Colors.gray,
-    textAlign: "center",
-    marginBottom: 28,
-  },
-  footerText: {
-    fontSize: 14,
-    color: Colors.gray,
-    textAlign: "center",
-    lineHeight: 16,
   },
 });

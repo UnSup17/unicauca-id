@@ -1,8 +1,9 @@
 "use client";
 
 import { CameraView, useCameraPermissions } from "expo-camera";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import type React from "react";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   Alert,
   BackHandler,
@@ -13,10 +14,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Colors } from "../constants/Colors";
-import { tryPostProfilePhoto } from "../services/cameraScreen";
-import { UserContext } from "../context/UserContext";
-import { LoadingContext } from "../context/LoadingContext";
+import { Colors } from "../../constants/Colors";
+import { LoadingContext } from "../../context/LoadingContext";
+import { UserContext } from "../../context/UserContext";
+import { tryPostProfilePhoto } from "../../services/cameraScreen";
 
 interface NavigationProps {
   navigation: any;
@@ -26,6 +27,7 @@ interface NavigationProps {
 export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
   const { setLoading } = useContext(LoadingContext);
   const [permission, requestPermission] = useCameraPermissions();
+  const [pictureSize, setPictureSize] = useState<string | undefined>(undefined);
   const cameraRef = useRef<CameraView>(null);
 
   const {
@@ -38,21 +40,21 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
 
   useEffect(() => {
     const backAction = () => {
-      // Retorna true para bloquear
       return true;
     };
-
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       backAction
     );
-
-    // Limpia el listener al desmontar
     return () => backHandler.remove();
   }, []);
 
   if (!permission) {
-    return <View />;
+    return (
+      <Text style={styles.message}>
+        Necesitamos permisos para usar la cámara
+      </Text>
+    );
   }
 
   if (!permission.granted) {
@@ -69,27 +71,54 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
   }
 
   const takePicture = async () => {
-    setLoading(true);
-    if (cameraRef.current) {
-      try {
-        const photo = await cameraRef.current.takePictureAsync({
-          base64: true,
-        });
-
-        const res = await tryPostProfilePhoto({
-          photo,
-          data,
-          token,
-          setUserData,
-        });
-        setLoading(false);
-        if (res) navigation.navigate("ID");
-      } catch (error) {
-        setLoading(false);
-        Alert.alert("Error", error + "");
-      }
+    if (!cameraRef.current) {
+      throw new Error("Error al acceder a la cámara");
     }
-    setLoading(false);
+    setLoading(true);
+    try {
+      const photo = await cameraRef.current.takePictureAsync({
+        base64: true,
+      });
+      const { width, height } = photo;
+      const side = Math.min(width, height);
+      const originX = (width - side) / 2;
+      const originY = (height - side) / 2;
+
+      const cropped = await manipulateAsync(
+        photo.uri,
+        [{ crop: { originX, originY, width: side, height: side } }],
+        {
+          base64: true,
+          compress: 1,
+          format: SaveFormat.JPEG,
+        }
+      );
+
+      const res = await tryPostProfilePhoto({
+        photo: { ...photo, base64: cropped.base64 },
+        data,
+        token,
+        setUserData,
+      });
+
+      if (res) navigation.navigate("ID");
+    } catch (error: any) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const prepareCamera = async () => {
+    try {
+      if (cameraRef.current) {
+        const supportedRatios =
+          await cameraRef.current.getAvailablePictureSizesAsync();
+        setPictureSize(supportedRatios[0]);
+      }
+    } catch (error: any) {
+      Alert.alert("prepareCameraError", error.message as string);
+    }
   };
 
   return (
@@ -100,7 +129,8 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
           style={styles.camera}
           facing={"front"}
           ref={cameraRef}
-          ratio="1:1"
+          pictureSize={pictureSize}
+          onCameraReady={prepareCamera}
         />
         <View style={styles.overlay}>
           <View style={styles.faceGuide} />
@@ -116,7 +146,6 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  //permissions
   messageContainer: {
     flex: 1,
     backgroundColor: Colors.primary,
@@ -154,7 +183,6 @@ const styles = StyleSheet.create({
   camera: {
     width: Dimensions.get("screen").width,
     height: Dimensions.get("screen").width,
-    // height: "100%"
   },
   overlay: {
     position: "absolute",
@@ -183,14 +211,6 @@ const styles = StyleSheet.create({
     paddingVertical: 32,
     backgroundColor: Colors.primary,
   },
-  controlButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "transparent",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   captureButton: {
     width: 80,
     height: 80,
@@ -200,11 +220,5 @@ const styles = StyleSheet.create({
     borderColor: Colors.white,
     justifyContent: "center",
     alignItems: "center",
-  },
-  captureButtonInner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: Colors.white,
   },
 });

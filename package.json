@@ -26,7 +26,9 @@
     "react-native-screens": "^4.11.1",
     "react-native-svg": "15.11.2",
     "react-native-svg-transformer": "^1.5.1",
-    "unicauca-id": "file:"
+    "unicauca-id": "file:",
+    "expo-image-manipulator": "~13.1.7",
+    "expo-screen-capture": "~7.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -1,5 +1,4 @@
 import { CameraCapturedPicture } from "expo-camera";
-import { Alert } from "react-native";
 
 interface ITryPostProfilePhoto {
   photo: CameraCapturedPicture,
@@ -30,4 +29,5 @@ export async function tryPostProfilePhoto({ photo, data, token, setUserData }: I
       }));
       return true;
     })
+    .catch((err: any) => { throw new Error("PostPhotoError " + err.message) })
 }

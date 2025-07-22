@@ -4,7 +4,7 @@ import { useState } from "react";
 import { BlobLoader } from "../components/BlobLoader";
 import { LoadingContext } from "../context/LoadingContext";
 import { IUserData, UserContext } from "../context/UserContext";
-import { CameraScreen } from "../screens/CameraScreen";
+import { CameraScreen } from "../screens/camera/CameraScreen";
 import { IDScreen } from "../screens/idScreen/IDScreen";
 import { LoginScreen } from "../screens/LoginScreen";
 import { WelcomeScreen } from "../screens/WelcomeScreen";
