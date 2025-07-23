@@ -39,7 +39,6 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
         {
           text: "Sí",
           onPress: () => {
-            setUserData(null);
             navigation.navigate("Login");
           },
         },

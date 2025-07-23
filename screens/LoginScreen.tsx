@@ -43,6 +43,10 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
   const { height } = useWindowDimensions();
 
   useEffect(() => {
+    setUserData(null);
+  }, []);
+
+  useEffect(() => {
     const backAction = () => {
       Alert.alert("Salir", "¿Quieres cerrar la aplicación?", [
         { text: "No", style: "cancel", onPress: () => null },

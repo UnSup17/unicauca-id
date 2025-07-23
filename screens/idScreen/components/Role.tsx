@@ -11,19 +11,18 @@ export default function Role({ imgW }: IRole) {
     userData: { currentUser },
   } = useContext(UserContext);
 
-  const roles = currentUser.roles
-    .replace("[", "")
-    .replace("]", "")
-    .replace(" ", "")
-    .split(",")
-    .reverse();
-
-  const numberRoles = roles.length;
+  const roles =
+    currentUser?.roles
+      .replace("[", "")
+      .replace("]", "")
+      .replace(" ", "")
+      .split(",")
+      .reverse() || [];
 
   const [actualRol, setactualRol] = useState(0);
 
   const handleNextRole = () => {
-    setactualRol((prev) => (prev + 1) % numberRoles);
+    setactualRol((prev) => (prev + 1) % roles.length);
   };
 
   return (
