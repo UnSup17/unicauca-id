@@ -7,8 +7,6 @@ interface Props {
 }
 
 export default function BloodType({ style }: Props) {
-  const {
-    userData: { currentUser },
-  } = useContext(UserContext);
-  return <Text style={style}>{currentUser.blood}</Text>;
+  const { userData } = useContext(UserContext);
+  return <Text style={style}>{userData?.currentUser?.blood}</Text>;
 }

@@ -16,10 +16,7 @@ export function QRCodeView({
   navigation,
 }: IQRCodeView) {
   const [info, setInfo] = useState<any>();
-  const {
-    userData: { token },
-    setUserData,
-  } = useContext(UserContext);
+  const { userData } = useContext(UserContext);
 
   useEffect(() => {
     const fetchData = () => {
@@ -28,7 +25,7 @@ export function QRCodeView({
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${userData.token}`,
           },
         }
       )
@@ -38,7 +35,6 @@ export function QRCodeView({
               "Sesión expirada",
               "Por favor inicia sesión nuevamente"
             );
-            setUserData(null);
             navigation.navigate("Login");
           }
           return res;

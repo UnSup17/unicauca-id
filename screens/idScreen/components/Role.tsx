@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { StyleSheet, Text, Pressable } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 import { UserContext } from "../../../context/UserContext";
 
 interface IRole {
@@ -7,12 +7,10 @@ interface IRole {
 }
 
 export default function Role({ imgW }: IRole) {
-  const {
-    userData: { currentUser },
-  } = useContext(UserContext);
+  const { userData } = useContext(UserContext);
 
   const roles =
-    currentUser?.roles
+    userData?.currentUser?.roles
       .replace("[", "")
       .replace("]", "")
       .replace(" ", "")

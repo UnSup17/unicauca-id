@@ -1,23 +1,27 @@
 "use client";
 
-import { CameraView, useCameraPermissions } from "expo-camera";
-import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
+import {
+  CameraCapturedPicture,
+  CameraView,
+  useCameraPermissions,
+} from "expo-camera";
+import {
+  ImageResult,
+  manipulateAsync,
+  SaveFormat,
+} from "expo-image-manipulator";
 import type React from "react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Alert,
   BackHandler,
-  Dimensions,
   SafeAreaView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Colors } from "../../constants/Colors";
-import { LoadingContext } from "../../context/LoadingContext";
-import { UserContext } from "../../context/UserContext";
-import { tryPostProfilePhoto } from "../../services/cameraScreen";
+import AcceptPhoto from "./components/AcceptPhoto";
+import { styles } from "./styles";
 
 interface NavigationProps {
   navigation: any;
@@ -25,18 +29,12 @@ interface NavigationProps {
 }
 
 export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
-  const { setLoading } = useContext(LoadingContext);
   const [permission, requestPermission] = useCameraPermissions();
   const [pictureSize, setPictureSize] = useState<string | undefined>(undefined);
   const cameraRef = useRef<CameraView>(null);
-
-  const {
-    userData: {
-      currentUser: { data },
-      token,
-    },
-    setUserData,
-  } = useContext(UserContext);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<CameraCapturedPicture>();
+  const [cropped, setCropped] = useState<ImageResult>();
 
   useEffect(() => {
     const backAction = () => {
@@ -74,18 +72,18 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
     if (!cameraRef.current) {
       throw new Error("Error al acceder a la cámara");
     }
-    setLoading(true);
     try {
-      const photo = await cameraRef.current.takePictureAsync({
+      const photoAux = await cameraRef.current.takePictureAsync({
         base64: true,
       });
-      const { width, height } = photo;
+      setPhoto(photoAux);
+      const { width, height } = photoAux;
       const side = Math.min(width, height);
       const originX = (width - side) / 2;
       const originY = (height - side) / 2;
 
-      const cropped = await manipulateAsync(
-        photo.uri,
+      const croppedAux = await manipulateAsync(
+        photoAux.uri,
         [{ crop: { originX, originY, width: side, height: side } }],
         {
           base64: true,
@@ -93,19 +91,10 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
           format: SaveFormat.JPEG,
         }
       );
-
-      const res = await tryPostProfilePhoto({
-        photo: { ...photo, base64: cropped.base64 },
-        data,
-        token,
-        setUserData,
-      });
-
-      if (res) navigation.navigate("ID");
+      setCropped(croppedAux);
+      setPhotoPreview(croppedAux.uri); // Mostrar modal con la foto
     } catch (error: any) {
       Alert.alert("Error", error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -141,84 +130,12 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
       <View style={styles.controls}>
         <TouchableOpacity style={styles.captureButton} onPress={takePicture} />
       </View>
+
+      {photoPreview && photo && cropped && (
+        <AcceptPhoto
+          {...{ cropped, navigation, photo, photoPreview, setPhotoPreview }}
+        />
+      )}
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  messageContainer: {
-    flex: 1,
-    backgroundColor: Colors.primary,
-    justifyContent: "center",
-  },
-  message: {
-    textAlign: "center",
-    paddingBottom: 10,
-    color: Colors.white,
-  },
-  button: {
-    backgroundColor: Colors.secondary,
-    padding: 16,
-    borderRadius: 8,
-    margin: 16,
-  },
-  buttonText: {
-    color: Colors.white,
-    textAlign: "center",
-    fontWeight: "600",
-  },
-  // camera
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    height: "100%",
-    backgroundColor: Colors.secondary,
-  },
-  cameraContainer: {
-    flex: 1,
-    overflow: "hidden",
-    position: "relative",
-    justifyContent: "center",
-  },
-  camera: {
-    width: Dimensions.get("screen").width,
-    height: Dimensions.get("screen").width,
-  },
-  overlay: {
-    position: "absolute",
-    backgroundColor: "transparent",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  faceGuide: {
-    width: Dimensions.get("screen").width / 2,
-    height: (Dimensions.get("screen").width / 5) * 4,
-    borderRadius: 65,
-    borderBottomLeftRadius: 125,
-    borderBottomRightRadius: 125,
-    borderWidth: 4,
-    marginHorizontal: Dimensions.get("screen").width / 4,
-    borderColor: Colors.lightGray,
-    justifyContent: "center",
-    backgroundColor: "transparent",
-  },
-  // controls
-  controls: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 32,
-    paddingVertical: 32,
-    backgroundColor: Colors.primary,
-  },
-  captureButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "transparent",
-    borderWidth: 4,
-    borderColor: Colors.white,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});

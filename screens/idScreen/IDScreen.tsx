@@ -30,7 +30,7 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
       ? medium
       : small;
 
-  const { userData, setUserData } = useContext(UserContext);
+  const { userData } = useContext(UserContext);
 
   useEffect(() => {
     const backAction = () => {
@@ -43,7 +43,7 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
           },
         },
       ]);
-      return true; // Bloquea la acción por defecto
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
@@ -59,7 +59,8 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
   }
 
   if (!userData || !userData?.currentUser) {
-    return <Text>:(</Text>;
+    navigation.navigate("Login");
+    return <></>;
   }
   return (
     <SafeAreaView style={styles.container}>
