@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Alert, DimensionValue, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
-import { UserContext } from "../../context/UserContext";
+import { UserContext } from "../../../context/UserContext";
 
 interface IQRCodeView {
   identification: string;

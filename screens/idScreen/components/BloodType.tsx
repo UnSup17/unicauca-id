@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Text } from "react-native";
-import { UserContext } from "../../context/UserContext";
+import { UserContext } from "../../../context/UserContext";
 
 interface Props {
   style: any;

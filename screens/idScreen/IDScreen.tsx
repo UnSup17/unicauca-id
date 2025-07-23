@@ -10,10 +10,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import Bottom from "../../assets/svgs/bottom_right.svg";
 import { UserContext } from "../../context/UserContext";
-import BloodType from "./BloodType";
-import PersonPhoto from "./PersonPhoto";
-import { QRCodeView } from "./QRCode";
-import TopLeftSVG from "./TopLeft";
+import BloodType from "./components/BloodType";
+import PersonPhoto from "./components/PersonPhoto";
+import { QRCodeView } from "./components/QRCode";
+import TopLeftSVG from "./components/TopLeft";
 import { large, medium, small } from "./styles";
 
 interface NavigationProps {
@@ -68,7 +68,9 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
         <View style={styles.upper}>
           <TopLeftSVG />
         </View>
-        <PersonPhoto styles={styles}></PersonPhoto>
+        <View style={{ top: styles.user.top, width: styles.card.width }}>
+          <PersonPhoto styles={styles}></PersonPhoto>
+        </View>
         <View style={styles.info}>
           <Text style={styles.name}>{userData.currentUser.name}</Text>
           <Text style={styles.lastname}>{userData.currentUser.surname}</Text>

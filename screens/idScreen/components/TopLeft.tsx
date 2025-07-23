@@ -1,6 +1,5 @@
 // Usar para decidir que color según el rol :v
-import { useState, useEffect } from "react";
-import Svg, { Path, Circle } from "react-native-svg";
+import Svg, { Circle, Path } from "react-native-svg";
 
 export default function TopLeftSVG() {
   const cls1 = "#2c3591";
