@@ -45,7 +45,7 @@ async function fetchisValidPhoto({ photo, token, type }: IFetchIsValidPhoto) {
     type: auxType.type,
   } as any);
 
-  return fetch(`http://192.168.52.65:8080/unid/faces/detect`, {
+  return fetch(`https://backend.unicauca.edu.co/unid/faces/detect`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
