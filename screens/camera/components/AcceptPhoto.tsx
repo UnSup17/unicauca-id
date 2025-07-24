@@ -37,7 +37,8 @@ export default function AcceptPhoto({
     setLoading(true);
     try {
       const res = await tryPostProfilePhoto({
-        photo: { ...photo, base64: cropped.base64 },
+        photo: cropped,
+        type: photo.format,
         data: userData?.currentUser?.data,
         token: userData?.token,
         setUserData,
