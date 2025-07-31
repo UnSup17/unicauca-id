@@ -88,6 +88,12 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
       const currentUser = jwtDecode(res);
       const token = JSON.parse(res).token;
 
+      if (!currentUser) {
+        throw new Error(
+          "No fue posible obtener información del usuario, dirígase a contact55"
+        );
+      }
+
       setUserData({ currentUser, token });
 
       await fetchIdScreenData({

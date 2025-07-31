@@ -10,7 +10,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import Bottom from "../../assets/svgs/bottom_right.svg";
 import { UserContext } from "../../context/UserContext";
-import BloodType from "./components/BloodType";
 import PersonPhoto from "./components/PersonPhoto";
 import { QRCodeView } from "./components/QRCode";
 import TopLeftSVG from "./components/TopLeft";
@@ -97,11 +96,11 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
                   ...styles.tableDesc,
                 }}
               >
-                {userData.currentUser.idNumber}
+                {userData.currentUser?.idType} {userData.currentUser?.idNumber}
               </Text>
-              <BloodType
-                style={{ width: styles.rhCol.width, ...styles.tableDesc }}
-              />
+              <Text style={{ width: styles.rhCol.width, ...styles.tableDesc }}>
+                {userData.currentUser?.blood}
+              </Text>
             </View>
           </View>
           <QRCodeView

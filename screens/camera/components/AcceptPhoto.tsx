@@ -48,12 +48,7 @@ export default function AcceptPhoto({
         navigation.navigate("ID");
       }
     } catch (error: any) {
-      Alert.alert(
-        "Error",
-        error.message.contains("person")
-          ? "Acércate a Contacto55 para completar tu registro en el sistema"
-          : error.message
-      );
+      Alert.alert("Error", error.message);
     } finally {
       setLoading(false);
       setPhotoPreview(null);

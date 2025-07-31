@@ -54,7 +54,7 @@ async function fetchisValidPhoto({ photo, token, type }: IFetchIsValidPhoto) {
   })
     .then((res) => {
       if (res.ok) return res.json();
-      throw new Error("Error en el servidor al validar la foto");
+      throw new Error("Error en el servidor al validar la foto, comuníquese con contacto@unicauca.edu.co");
     })
     .catch((err: any) => {
       throw new Error("Error validando foto: " + err.message);
