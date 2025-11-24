@@ -21,7 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.unicauca.id",
-      "versionCode": 1,
+      "versionCode": 3,
       "permissions": [
         "CAMERA",
         "android.permission.CAMERA",
@@ -38,13 +38,20 @@
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera"
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "extra": {
       "eas": {
-        "projectId": "0aee6e5d-7bad-47ac-b075-b8f07a284e55"
+        "projectId": "332cf6e0-e115-45b6-9c95-642cc51f52f1"
       }
     },
-    "owner": "unsup17"
+    "owner": "diecode",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/332cf6e0-e115-45b6-9c95-642cc51f52f1"
+    }
   }
 }

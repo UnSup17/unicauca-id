@@ -8,7 +8,7 @@ export async function login(username: string, password: string) {
   })
     .then(response => {
       if (!response.ok) {
-        throw new Error('Login failed');
+        throw new Error('Inicio de sesión falló');
       }
       return response.text();
     })

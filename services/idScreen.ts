@@ -7,9 +7,8 @@ interface IFetchIdScreenData {
 
 export async function fetchIdScreenData({ idNumber, token, setUserData, navigation }: IFetchIdScreenData) {
   try {
-    const [photoExist, _] = await Promise.all([
-      fetchArmaturaData(idNumber, token, setUserData),
-      fetchBloodType(idNumber, token, setUserData)
+    const [photoExist] = await Promise.all([
+      fetchArmaturaData(idNumber, token, setUserData)
     ]);
     if (photoExist) {
       navigation.navigate("ID");
@@ -40,25 +39,5 @@ async function fetchArmaturaData(idNumber: string, token: string, setUserData: (
       }))
       return data?.personPhoto;
     })
-    .catch(() => null);
-}
-
-async function fetchBloodType(idNumber: string, token: string, setUserData: (data: any) => void) {
-  fetch(`https://backend.unicauca.edu.co/unid/simca/userBlood/${idNumber}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  )
-    .then((data) => data.text())
-    .then((text) => setUserData((prev: any) => ({
-      ...prev,
-      currentUser: {
-        ...prev.currentUser,
-        blood: text
-      }
-    })))
     .catch(() => null);
 }

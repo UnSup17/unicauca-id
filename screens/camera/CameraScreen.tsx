@@ -78,16 +78,19 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
       });
       setPhoto(photoAux);
       const { width, height } = photoAux;
-      const side = Math.min(width, height);
-      const originX = (width - side) / 2;
-      const originY = (height - side) / 2;
+      const side = Math.floor(Math.min(width, height));
+      const originX = Math.floor((width - side) / 2);
+      const originY = Math.floor((height - side) / 2);
 
       const croppedAux = await manipulateAsync(
         photoAux.uri,
-        [{ crop: { originX, originY, width: side, height: side } }],
+        [
+          { crop: { originX, originY, width: side, height: side } },
+          { resize: { width: 500, height: 500 } },
+        ],
         {
           base64: true,
-          compress: 1,
+          compress: 0.4,
           format: SaveFormat.JPEG,
         }
       );
@@ -103,7 +106,7 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
       if (cameraRef.current) {
         const supportedRatios =
           await cameraRef.current.getAvailablePictureSizesAsync();
-        setPictureSize(supportedRatios[0]);
+        setPictureSize(supportedRatios[Math.floor(supportedRatios.length / 2)]);
       }
     } catch (error: any) {
       Alert.alert("prepareCameraError", error.message as string);
