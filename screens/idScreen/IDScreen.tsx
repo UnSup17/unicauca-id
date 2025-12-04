@@ -78,7 +78,7 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
         <View style={styles.upper}>
           <TopLeftSVG roles={roles} currentRoleIndex={currentRoleIndex} />
         </View>
-        <View style={{ top: styles.user.top, width: styles.card.width }}>
+        <View style={{ top: styles.user.top, width: styles.card.width, zIndex: 10 }}>
           <PersonPhoto
             styles={styles}
             currentRoleIndex={currentRoleIndex}
