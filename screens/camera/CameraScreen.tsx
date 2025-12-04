@@ -28,7 +28,7 @@ interface NavigationProps {
   route?: any;
 }
 
-export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
+export const CameraScreen: React.FC<NavigationProps> = ({ navigation, route }) => {
   const [permission, requestPermission] = useCameraPermissions();
   const [pictureSize, setPictureSize] = useState<string | undefined>(undefined);
   const cameraRef = useRef<CameraView>(null);
@@ -136,7 +136,14 @@ export const CameraScreen: React.FC<NavigationProps> = ({ navigation }) => {
 
       {photoPreview && photo && cropped && (
         <AcceptPhoto
-          {...{ cropped, navigation, photo, photoPreview, setPhotoPreview }}
+          {...{
+            cropped,
+            navigation,
+            photo,
+            photoPreview,
+            setPhotoPreview,
+            observationId: route?.params?.observationId,
+          }}
         />
       )}
     </SafeAreaView>

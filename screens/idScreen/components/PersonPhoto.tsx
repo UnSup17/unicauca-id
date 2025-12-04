@@ -14,7 +14,7 @@ export interface IPersonPhoto {
   };
 }
 
-export default function PersonPhoto({ styles: { user } }: IPersonPhoto) {
+export default function PersonPhoto({ styles: { user }, currentRoleIndex, onRoleChange, roles }: IPersonPhoto & { currentRoleIndex: number, onRoleChange: () => void, roles: string[] }) {
   const { userData } = useContext(UserContext);
 
   if (!userData || !userData.currentUser?.data) {
@@ -34,7 +34,7 @@ export default function PersonPhoto({ styles: { user } }: IPersonPhoto) {
           resizeMode: "stretch",
         }}
       />
-      <Role imgW={user.width} />
+      <Role imgW={user.width} currentRoleIndex={currentRoleIndex} onRoleChange={onRoleChange} roles={roles} />
     </View>
   );
 }

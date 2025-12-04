@@ -47,7 +47,7 @@ export function QRCodeView({
     fetchData();
     const interval = setInterval(() => {
       fetchData();
-    }, 3000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, []);

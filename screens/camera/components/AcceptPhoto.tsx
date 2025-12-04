@@ -14,6 +14,7 @@ import { Colors } from "../../../constants/Colors";
 import { LoadingContext } from "../../../context/LoadingContext";
 import { UserContext } from "../../../context/UserContext";
 import { tryPostProfilePhoto } from "../../../services/cameraScreen";
+import { deleteObservation } from "../../../services/observations";
 import { styles } from "../styles";
 
 interface IAcceptPhoto {
@@ -22,6 +23,7 @@ interface IAcceptPhoto {
   cropped: ImageResult;
   navigation: any;
   setPhotoPreview: (value: React.SetStateAction<string | null>) => void;
+  observationId?: string;
 }
 export default function AcceptPhoto({
   photoPreview,
@@ -29,6 +31,7 @@ export default function AcceptPhoto({
   cropped,
   navigation,
   setPhotoPreview,
+  observationId,
 }: IAcceptPhoto) {
   const { setLoading } = useContext(LoadingContext);
   const { userData, setUserData } = useContext(UserContext);
@@ -45,6 +48,9 @@ export default function AcceptPhoto({
       });
 
       if (res) {
+        if (observationId) {
+          await deleteObservation(observationId);
+        }
         navigation.navigate("ID");
       }
     } catch (error: any) {

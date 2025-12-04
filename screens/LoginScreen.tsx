@@ -24,11 +24,11 @@ import { LoadingContext } from "../context/LoadingContext";
 import { UserContext } from "../context/UserContext";
 import { fetchIdScreenData } from "../services/idScreen";
 import { login } from "../services/login";
+import { checkObservation } from "../services/observations";
 import { encodePassword } from "../util/cryp";
 
 interface NavigationProps {
   navigation: any;
-  route?: any;
 }
 
 export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
@@ -96,12 +96,19 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
 
       setUserData({ currentUser, token });
 
-      await fetchIdScreenData({
-        idNumber: (currentUser as any).idNumber,
-        token,
-        setUserData,
-        navigation,
-      });
+      // Check for observations
+      const observation = await checkObservation((currentUser as any).idNumber);
+      
+      if (observation && observation.id) {
+        navigation.navigate("Observation", { observation });
+      } else {
+        await fetchIdScreenData({
+          idNumber: (currentUser as any).idNumber,
+          token,
+          setUserData,
+          navigation,
+        });
+      }
     } catch (error: any) {
       Alert.alert("Login error", error.message);
     } finally {

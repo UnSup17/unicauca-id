@@ -1,11 +1,15 @@
 // Usar para decidir que color según el rol :v
 import Svg, { Circle, Path } from "react-native-svg";
+import { getColorsForRole } from "../../../util/roleUtils";
 
-export default function TopLeftSVG() {
+export default function TopLeftSVG({ roles, currentRoleIndex }: { roles: string[], currentRoleIndex: number }) {
   const cls1 = "#2c3591";
   const cls2 = "#27316b";
   const cls3 = "#27306b";
-  const cls4 = "#ab1919";
+
+
+  const { borderColor } = getColorsForRole(roles[currentRoleIndex]);
+  const cls4 = borderColor;
 
   return (
     <>
@@ -51,7 +55,7 @@ export default function TopLeftSVG() {
           fill={cls4}
         />
         <Path
-          d="M884.34 899.7c-.06-2.6-.13-5.83-.13-11.47V423.48c0-49.08-39.93-89-89-89H308.65c-49.07 0-89 39.92-89 89 0 0-.25 187.93-.19 326.95.02 47.05.08 88.48.19 115.14.21 49.08 39.93 89 89 89h444.34c16.23 1.01 24.27 7.73 30.07 17.99 13.51 23.86-18 54-18 54s42.46 15.07 78.28-9.57c26.07-17.92 38.76-54.19 40.86-103.51.29-7.01.23-9.7.14-13.77Zm-15.84 11.58c-5.14 120.53-81.69 104.19-81.69 104.19s8.85-6.13 11.57-21.79c4.11-23.64-8.85-55.22-45.63-55.22H310.54c-40.91 0-74.19-33.28-74.19-74.19V424.71c0-40.91 33.29-74.19 74.19-74.19h483.77c40.91 0 74.19 33.29 74.19 74.19V886.8c0 14.31.47 13.59 0 24.49Z"
+          d="M 884.34 899.7 c -0.06 -2.6 -0.13 -5.83 -0.13 -11.47 V 423.48 c 0 -49.08 -39.93 -89 -89 -89 H 308.65 c -49.07 0 -89 39.92 -89 89 c 0 0 -0.25 187.93 -0.19 326.95 c 0.02 47.05 0.08 88.48 0.19 115.14 c 0.21 49.08 39.93 89 89 89 h 444.34 c 16.23 1.01 24.27 7.73 30.07 17.99 c 13.51 23.86 -18 54 -18 54 s 42.46 15.07 78.28 -9.57 c 26.07 -17.92 38.76 -54.19 40.86 -103.51 c 0.29 -7.01 0.23 -9.7 0.14 -13.77 Z Z"
           fill={cls4}
         />
 

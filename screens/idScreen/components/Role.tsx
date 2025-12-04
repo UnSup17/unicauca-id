@@ -1,31 +1,12 @@
-import { useContext, useState } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
-import { UserContext } from "../../../context/UserContext";
+import { getColorsForRole } from "../../../util/roleUtils";
 
-interface IRole {
-  imgW: number;
-}
+export default function Role({ imgW, currentRoleIndex, onRoleChange, roles }: { imgW: number, currentRoleIndex: number, onRoleChange: () => void, roles: string[] }) {
 
-export default function Role({ imgW }: IRole) {
-  const { userData } = useContext(UserContext);
-
-  const roles =
-    userData?.currentUser?.roles
-      .replace("[", "")
-      .replace("]", "")
-      .replace(" ", "")
-      .split(",")
-      .reverse() || [];
-
-  const [actualRol, setactualRol] = useState(0);
-
-  const handleNextRole = () => {
-    setactualRol((prev) => (prev + 1) % roles.length);
-  };
-
+  const { roleColor } = getColorsForRole(roles[currentRoleIndex]);
   return (
     <Pressable
-      onPress={handleNextRole}
+      onPress={onRoleChange}
       style={[
         styles.labelWrapper,
         {
@@ -33,7 +14,7 @@ export default function Role({ imgW }: IRole) {
         },
       ]}
     >
-      <Text style={styles.label}>{roles[actualRol]}</Text>
+      <Text style={[styles.label, { color: roleColor }]}>{roles[currentRoleIndex]}</Text>
     </Pressable>
   );
 }
@@ -46,6 +27,5 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#AB1919",
   },
 });

@@ -245,7 +245,7 @@ const large: IDScreenStyles = StyleSheet.create<IDScreenStyles>({
   user: {
     width: 250,
     height: 230,
-    borderRadius: 20,
+    borderRadius: 30,
     top: 136,
   },
   info: {

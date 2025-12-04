@@ -52,19 +52,17 @@ export const WelcomeScreen: React.FC<NavigationProps> = ({ navigation }) => {
       >
         {/* Content */}
         <View style={styles.container}>
-          <Text style={styles.title}>Bienvenido</Text>
+          <Text style={styles.title}>Bienvenido(a) Unicaucano(a)</Text>
           <View style={styles.titleLine} />
 
           {/* Description */}
           <Text style={styles.description}>
-            Este es el aplicativo oficial de la Universidad del Cauca para la
-            creación del carné digital, una herramienta práctica y sostenible
-            que te identifica como miembro activo de nuestra comunidad
-            universitaria.
+            Estás ingresando al aplicativo oficial del carné digital de la Universidad del Cauca;
+            una herramienta que te identifica y acredita como miembro activo(a) de nuestra casa de estudios.
           </Text>
 
           <Text style={styles.subtitle}>
-            ¡Tu identidad universitaria más cerca que nunca!
+            *No olvides que se trata de un documento digital que te permite acceder a nuestras instalaciones y hacer uso de diferentes servicios.
           </Text>
 
           {/* Camera Button */}
