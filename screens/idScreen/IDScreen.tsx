@@ -64,7 +64,7 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
     return <></>;
   }
 
-  const roles = parseRoles(userData.currentUser.roles);
+  const roles = parseRoles("" + userData.currentUser.roles);
   const currentRole = roles[currentRoleIndex] || "";
   const { nameColor, surnameColor, tableTextColor } = getColorsForRole(currentRole);
 
