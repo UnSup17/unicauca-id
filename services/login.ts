@@ -1,5 +1,7 @@
+import { apiFetch } from '../util/api';
+
 export async function login(username: string, password: string) {
-  const res = fetch(`https://backend.unicauca.edu.co/unid/login`, {
+  const res = apiFetch(`/login`, {
     method: 'POST',
     body: JSON.stringify({
       username,

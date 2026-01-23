@@ -1,8 +1,8 @@
-const BASE_URL = "https://backend.unicauca.edu.co/unid";
+import { apiFetch } from '../util/api';
 
 export async function checkObservation(idNumber: string) {
   try {
-    const response = await fetch(`${BASE_URL}/admin/observations/identificacion/${idNumber}`, {
+    const response = await apiFetch(`/admin/observations/identificacion/${idNumber}`, {
       headers: {
         'X-Unicaucaid-Key': 'CONTACTO55SECRETKEY;)',
       },
@@ -24,7 +24,7 @@ export async function checkObservation(idNumber: string) {
 
 export async function deleteObservation(id: string) {
   try {
-    const response = await fetch(`${BASE_URL}/admin/observations/${id}`, {
+    const response = await apiFetch(`/admin/observations/${id}`, {
       method: "DELETE",
       headers: {
         'X-Unicaucaid-Key': 'CONTACTO55SECRETKEY;)',

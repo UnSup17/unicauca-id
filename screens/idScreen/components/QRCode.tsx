@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Alert, DimensionValue, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { UserContext } from "../../../context/UserContext";
+import { apiFetch } from "../../../util/api";
 
 interface IQRCodeView {
   identification: string;
@@ -20,8 +21,8 @@ export function QRCodeView({
 
   useEffect(() => {
     const fetchData = () => {
-      fetch(
-        `https://backend.unicauca.edu.co/unid/armatura/${identification}/qr`,
+      apiFetch(
+        `/armatura/${identification}/qr`,
         {
           method: "POST",
           headers: {

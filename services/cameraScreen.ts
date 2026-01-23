@@ -1,5 +1,6 @@
 import { ImageResult } from "expo-image-manipulator";
 import { Alert } from "react-native";
+import { apiFetch } from "../util/api";
 
 interface ITryPostProfilePhoto {
   photo: ImageResult,
@@ -45,7 +46,7 @@ async function fetchisValidPhoto({ photo, token, type }: IFetchIsValidPhoto) {
     type: auxType.type,
   } as any);
 
-  return fetch(`https://backend.unicauca.edu.co/unid/faces/detect`, {
+  return apiFetch(`/faces/detect`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ interface IFetchPostPhoto {
   setUserData: (data: any) => void
 }
 async function fetchPostPhoto({ data, setUserData, token }: IFetchPostPhoto) {
-  return fetch(`https://backend.unicauca.edu.co/unid/armatura/update`,
+  return apiFetch(`/armatura/update`,
     {
       method: "POST",
       headers: {

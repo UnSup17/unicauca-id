@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { AppNavigator } from "./navigation/AppNavigator";
 import { UpdateScreen } from "./screens/UpdateScreen";
+import { apiFetch } from "./util/api";
 
 export default function App() {
   const [isUpdateRequired, setIsUpdateRequired] = useState(false);
@@ -13,7 +14,7 @@ export default function App() {
   const checkAppVersion = useCallback(async () => {
     setIsChecking(true);
     try {
-      const response = await fetch("https://backend.unicauca.edu.co/unid/app/latest");
+      const response = await apiFetch("/app/latest");
       if (response.ok) {
         const remoteVersionRaw = await response.text();
         const remoteVer = remoteVersionRaw.trim();

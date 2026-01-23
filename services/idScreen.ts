@@ -20,8 +20,10 @@ export async function fetchIdScreenData({ idNumber, token, setUserData, navigati
   }
 }
 
+import { apiFetch } from '../util/api';
+
 async function fetchArmaturaData(idNumber: string, token: string, setUserData: (data: any) => void) {
-  return fetch(`https://backend.unicauca.edu.co/unid/armatura/${idNumber}/data`, {
+  return apiFetch(`/armatura/${idNumber}/data`, {
     headers: {
       Authorization: `Bearer ${token}`,
     }

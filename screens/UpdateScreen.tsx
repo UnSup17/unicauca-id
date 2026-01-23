@@ -1,4 +1,5 @@
 import React from 'react';
+import { apiFetch } from '../util/api';
 import { View, Text, StyleSheet, TouchableOpacity, Linking, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -9,11 +10,34 @@ interface UpdateScreenProps {
 }
 
 export const UpdateScreen = ({ onRetry, remoteVersion }: UpdateScreenProps) => {
+  const [updateUrl, setUpdateUrl] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const fetchUpdateUrl = async () => {
+      const configKey = Platform.OS === 'ios' ? 'UPDATE_IOS' : 'UPDATE_ANDROID';
+      try {
+        const response = await apiFetch(`/app/config/${configKey}`);
+        if (response.ok) {
+          const url = await response.text();
+          setUpdateUrl(url);
+        }
+      } catch (error) {
+        console.error("Error fetching update URL:", error);
+      }
+    };
+    fetchUpdateUrl();
+  }, []);
+
   const updateApp = () => {
-    if (Platform.OS === 'ios') {
-      Linking.openURL('https://apps.apple.com/app/unicauca-id/id1552252568');
+    if (updateUrl) {
+      Linking.openURL(updateUrl);
     } else {
-      Linking.openURL('https://play.google.com/store/apps/details?id=com.unicauca.id');
+      // Fallback in case fetch fails
+      if (Platform.OS === 'ios') {
+        Linking.openURL('https://apps.apple.com/app/unicauca-id/id1552252568');
+      } else {
+        Linking.openURL('https://play.google.com/store/apps/details?id=com.unicauca.id');
+      }
     }
   };
   return (
