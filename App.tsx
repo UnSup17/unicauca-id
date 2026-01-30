@@ -4,15 +4,20 @@ import { useEffect, useState, useCallback } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { AppNavigator } from "./navigation/AppNavigator";
 import { UpdateScreen } from "./screens/UpdateScreen";
-import { apiFetch } from "./util/api";
+import { apiFetch, NetworkError } from "./util/api";
+import { NetworkErrorDisplay } from "./components/NetworkErrorDisplay";
 
 export default function App() {
   const [isUpdateRequired, setIsUpdateRequired] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
-  const [remoteVersion, setRemoteVersion] = useState<string | undefined>(undefined);
+  const [remoteVersion, setRemoteVersion] = useState<string | undefined>(
+    undefined,
+  );
+  const [networkError, setNetworkError] = useState<NetworkError | null>(null);
 
   const checkAppVersion = useCallback(async () => {
     setIsChecking(true);
+    setNetworkError(null);
     try {
       const response = await apiFetch("/app/latest");
       if (response.ok) {
@@ -27,24 +32,30 @@ export default function App() {
           setIsUpdateRequired(false);
         }
       } else {
-        // If check fails, we might want to let them in or block. 
-        // For now, let's assume if we can't check, we let them in (fail open) 
-        // OR we can retry. Let's fail open for network errors but log it.
-        // User asked to block until version matches, so maybe fail closed?
-        // But if offline? Let's stick to the happy path for now and just set required=false if error
-        // to avoid blocking legitimate offline use, unless strict requirement.
-        // Given "bloquee el ingreso... hasta que coincida", implies strictness.
-        // But for dev/demo, let's just handle the mismatch case explicitly.
+        // Server respondió pero con error (4xx, 5xx)
+        console.error("Server error:", response.status, response.statusText);
         setIsUpdateRequired(false);
       }
     } catch (error) {
       console.error("Error checking app version:", error);
-      // Fail open on error for now to avoid locking out on network error
-      setIsUpdateRequired(false);
+
+      // Guardar el error para mostrarlo al usuario
+      if (error instanceof NetworkError) {
+        setNetworkError(error);
+        // NO establecer isChecking=false aquí, se hará en el finally
+        // pero tampoco queremos proceder automáticamente
+      } else {
+        // Para otros errores, fail open
+        setIsUpdateRequired(false);
+      }
     } finally {
-      setIsChecking(false);
+      // Solo dejar de "checking" si no hay error de red pendiente
+      // Si hay error de red, el usuario debe decidir qué hacer
+      if (!networkError) {
+        setIsChecking(false);
+      }
     }
-  }, []);
+  }, [networkError]);
 
   useEffect(() => {
     const blockScreenshots = async () => {
@@ -61,20 +72,44 @@ export default function App() {
 
   if (isChecking) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#000066" />
-      </View>
+      <>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color="#000066" />
+        </View>
+        {networkError && (
+          <NetworkErrorDisplay
+            error={networkError}
+            onDismiss={() => {
+              setNetworkError(null);
+              setIsChecking(false);
+              setIsUpdateRequired(false);
+            }}
+            onRetry={checkAppVersion}
+          />
+        )}
+      </>
     );
   }
 
   if (isUpdateRequired) {
-    return <UpdateScreen onRetry={checkAppVersion} remoteVersion={remoteVersion} />;
+    return (
+      <UpdateScreen onRetry={checkAppVersion} remoteVersion={remoteVersion} />
+    );
   }
 
   return (
     <>
       <StatusBar style="dark" />
       <AppNavigator />
+      {networkError && (
+        <NetworkErrorDisplay
+          error={networkError}
+          onDismiss={() => setNetworkError(null)}
+          onRetry={checkAppVersion}
+        />
+      )}
     </>
   );
 }
