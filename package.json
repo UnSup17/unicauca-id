@@ -13,7 +13,7 @@
     "@react-navigation/native": "^7.1.10",
     "@react-navigation/stack": "^7.3.3",
     "crypto-js": "^4.2.0",
-    "expo": "~53.0.24",
+    "expo": "~53.0.25",
     "expo-asset": "~11.1.7",
     "expo-camera": "~16.1.11",
     "expo-image": "~2.4.1",
