@@ -39,7 +39,7 @@ export function QRCodeView({
         })
         .then((res) => res.text())
         .then((text) => setInfo(text))
-        .catch((err) => setInfo(err));
+        .catch((err) => setInfo("" + err));
     };
 
     fetchData();

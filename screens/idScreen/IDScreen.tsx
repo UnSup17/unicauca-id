@@ -30,11 +30,14 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
       ? medium
       : small;
 
+  console.log("[ID_SCREEN] Initializing IDScreen...");
   const { userData } = useContext(UserContext);
   const [currentRoleIndex, setCurrentRoleIndex] = React.useState(0);
 
   useEffect(() => {
+    console.log("[ID_SCREEN] Component mounted. BackHandler setting up...");
     const backAction = () => {
+      console.log("[ID_SCREEN] Back button pressed");
       Alert.alert("Salir", "¿Cerrar sesión?", [
         { text: "No", style: "cancel", onPress: () => null },
         {
@@ -49,7 +52,7 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
 
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
-      backAction
+      backAction,
     );
 
     return () => backHandler.remove();
@@ -60,11 +63,17 @@ export const IDScreen: React.FC<NavigationProps> = ({ navigation }) => {
   }
 
   if (!userData || !userData?.currentUser) {
+    console.warn("[ID_SCREEN] No user data found, navigating back to Login");
     navigation.navigate("Login");
     return <></>;
   }
 
+  console.log(
+    "[ID_SCREEN] Rendering main content for ID:",
+    userData.currentUser.idNumber,
+  );
   const roles = parseRoles("" + userData.currentUser.roles);
+  console.log("[ID_SCREEN] Parsed roles:", roles);
   const currentRole = roles[currentRoleIndex] || "";
   const { nameColor, surnameColor, tableTextColor } = getColorsForRole(currentRole);
 

@@ -85,29 +85,38 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
         throw new Error("Credenciales incorrectas");
       }
 
+      console.log("[LOGIN_SCREEN] Login successful, decoding token...");
       const currentUser = jwtDecode(res);
       const token = JSON.parse(res).token;
 
       if (!currentUser) {
+        console.error("[LOGIN_SCREEN] ERROR: User details missing in token");
         throw new Error(
-          "No fue posible obtener información del usuario, dirígase a contact55"
+          "No fue posible obtener información del usuario, dirígase a contact55",
         );
       }
 
+      console.log(
+        "[LOGIN_SCREEN] Setting user data and checking observations for ID:",
+        (currentUser as any).idNumber,
+      );
       setUserData({ currentUser, token });
 
       // Check for observations
       const observation = await checkObservation((currentUser as any).idNumber);
-      
+
       if (observation && observation.id) {
+        console.log("[LOGIN_SCREEN] Navigating to Observation screen");
         navigation.navigate("Observation", { observation });
       } else {
+        console.log("[LOGIN_SCREEN] Calling fetchIdScreenData...");
         await fetchIdScreenData({
           idNumber: (currentUser as any).idNumber,
           token,
           setUserData,
           navigation,
         });
+        console.log("[LOGIN_SCREEN] fetchIdScreenData call finished");
       }
     } catch (error: any) {
       Alert.alert("Login error", error.message);
