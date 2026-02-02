@@ -1,5 +1,5 @@
 export const getColorsForRole = (role: string) => {
-  const normalizedRole = role.toUpperCase().trim();
+  const normalizedRole = (role || "").toUpperCase().trim();
 
   switch (normalizedRole) {
     case "CONTRATISTA":

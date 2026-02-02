@@ -16,10 +16,6 @@ export async function login(username: string, password: string) {
     })
     .then(token => {
       return token;
-    })
-    .catch(error => {
-      console.error('Login error:', error);
-      return null;
     });
   return res;
 }

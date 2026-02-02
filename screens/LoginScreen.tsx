@@ -81,8 +81,8 @@ export const LoginScreen: React.FC<NavigationProps> = ({ navigation }) => {
       }
 
       const res = await login(username, encodePassword(password) || "");
-      if (!res) {
-        throw new Error("Credenciales incorrectas");
+      if (!res || res === "null") {
+        throw new Error("Credenciales incorrectas o usuario no encontrado");
       }
 
       console.log("[LOGIN_SCREEN] Login successful, decoding token...");

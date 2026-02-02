@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Alert, DimensionValue, View, Text } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { UserContext } from "../../../context/UserContext";
-import { apiFetch, IS_LOCAL } from "../../../util/api";
+import { apiFetch, getCurrentEnv } from "../../../util/api";
 
 interface IQRCodeView {
   identification: string;
@@ -54,8 +54,8 @@ export function QRCodeView({
     <View style={{ paddingTop: paddingTop }}>
       <QRCode value={info} size={size} backgroundColor="white" />
 
-      {/* Debug: Show API response only in local development */}
-      {IS_LOCAL && (
+      {/* Debug: Show API response only in local development or test */}
+      {getCurrentEnv() !== "PROD" && (
         <View
           style={{
             marginTop: 8,

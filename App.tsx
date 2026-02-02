@@ -4,8 +4,11 @@ import { useEffect, useState, useCallback } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { AppNavigator } from "./navigation/AppNavigator";
 import { UpdateScreen } from "./screens/UpdateScreen";
-import { apiFetch, NetworkError } from "./util/api";
+import { apiFetch, NetworkError, initEnvironment } from "./util/api";
 import { NetworkErrorDisplay } from "./components/NetworkErrorDisplay";
+import { EnvironmentSwitcher } from "./components/EnvironmentSwitcher";
+import ErrorBoundary from "react-native-error-boundary";
+import { Text, Alert } from "react-native";
 
 export default function App() {
   const [isUpdateRequired, setIsUpdateRequired] = useState(false);
@@ -61,9 +64,12 @@ export default function App() {
     const blockScreenshots = async () => {
       await ScreenCapture.preventScreenCaptureAsync();
     };
-    blockScreenshots();
-
-    checkAppVersion();
+    const setup = async () => {
+      await blockScreenshots();
+      await initEnvironment();
+      await checkAppVersion();
+    };
+    setup();
 
     return () => {
       ScreenCapture.allowScreenCaptureAsync();
@@ -99,10 +105,50 @@ export default function App() {
     );
   }
 
+  const errorHandler = (error: Error, stackTrace: string) => {
+    console.error("[CRITICAL_ERROR]", error, stackTrace);
+  };
+
   return (
     <>
       <StatusBar style="dark" />
-      <AppNavigator />
+      <ErrorBoundary
+        onError={errorHandler}
+        FallbackComponent={({ error, resetError }) => (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              padding: 20,
+            }}
+          >
+            <ActivityIndicator size="large" color="#CC0000" />
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "bold",
+                marginTop: 20,
+                textAlign: "center",
+              }}
+            >
+              Se ha detectado un error inesperado
+            </Text>
+            <Text style={{ color: "gray", marginTop: 10, textAlign: "center" }}>
+              {error.toString()}
+            </Text>
+            <View style={{ marginTop: 20 }}>
+              <ActivityIndicator size="small" color="#000066" />
+              <Text style={{ fontSize: 12, color: "#999", marginTop: 5 }}>
+                Usa el botón de debug para cambiar de entorno o revisar logs
+              </Text>
+            </View>
+          </View>
+        )}
+      >
+        <AppNavigator />
+      </ErrorBoundary>
+      <EnvironmentSwitcher />
       {networkError && (
         <NetworkErrorDisplay
           error={networkError}
