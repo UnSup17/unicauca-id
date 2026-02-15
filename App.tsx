@@ -21,6 +21,7 @@ export default function App() {
   const checkAppVersion = useCallback(async () => {
     setIsChecking(true);
     setNetworkError(null);
+    let hasError = false;
     try {
       const response = await apiFetch("/app/latest");
       if (response.ok) {
@@ -35,30 +36,33 @@ export default function App() {
           setIsUpdateRequired(false);
         }
       } else {
-        // Server respondió pero con error (4xx, 5xx)
         console.error("Server error:", response.status, response.statusText);
         setIsUpdateRequired(false);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error checking app version:", error);
+      hasError = true;
 
-      // Guardar el error para mostrarlo al usuario
-      if (error instanceof NetworkError) {
-        setNetworkError(error);
-        // NO establecer isChecking=false aquí, se hará en el finally
-        // pero tampoco queremos proceder automáticamente
+      // Custom maintenance message for app/latest failure
+      if (
+        error instanceof NetworkError ||
+        error.message.includes("Network request failed")
+      ) {
+        const maintenanceError = new NetworkError(
+          "El servidor se encuentra en mantenimiento. Si la situación continua por favor envía un correo a contacto@unicauca.edu.co",
+          "NETWORK",
+          "/app/latest",
+        );
+        setNetworkError(maintenanceError);
       } else {
-        // Para otros errores, fail open
         setIsUpdateRequired(false);
       }
     } finally {
-      // Solo dejar de "checking" si no hay error de red pendiente
-      // Si hay error de red, el usuario debe decidir qué hacer
-      if (!networkError) {
+      if (!hasError) {
         setIsChecking(false);
       }
     }
-  }, [networkError]);
+  }, []); // Removed dependency on networkError to prevent loop
 
   useEffect(() => {
     const blockScreenshots = async () => {
@@ -67,14 +71,14 @@ export default function App() {
     const setup = async () => {
       await blockScreenshots();
       await initEnvironment();
-      await checkAppVersion();
+      checkAppVersion();
     };
     setup();
 
     return () => {
       ScreenCapture.allowScreenCaptureAsync();
     };
-  }, [checkAppVersion]);
+  }, []); // Only run on mount
 
   if (isChecking) {
     return (
@@ -84,6 +88,7 @@ export default function App() {
         >
           <ActivityIndicator size="large" color="#000066" />
         </View>
+        <EnvironmentSwitcher />
         {networkError && (
           <NetworkErrorDisplay
             error={networkError}

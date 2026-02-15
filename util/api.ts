@@ -5,12 +5,14 @@ export type Environment = 'PROD' | 'TEST' | 'DEV';
 export const ENVIRONMENTS: Record<Environment, string> = {
   PROD: "https://backend.unicauca.edu.co/unid",
   TEST: "https://kubetest.unicauca.edu.co/unid",
-  DEV: "http://192.168.101.16:8080/unid",
+  DEV: "http://192.168.101.14:8080/unid",
 };
 
 const ENV_STORAGE_KEY = '@app_environment';
+const DEV_URL_STORAGE_KEY = '@app_dev_url';
 
 let currentEnv: Environment = 'PROD';
+let currentDevUrl = ENVIRONMENTS.DEV;
 let currentBaseUrl = ENVIRONMENTS.PROD;
 
 // Global debug state for the overlay
@@ -47,16 +49,37 @@ export const getCurrentEnv = () => currentEnv;
 
 export const setEnvironment = async (env: Environment) => {
   currentEnv = env;
-  currentBaseUrl = ENVIRONMENTS[env];
+  currentBaseUrl = env === 'DEV' ? currentDevUrl : ENVIRONMENTS[env];
   console.log(`[API] Environment changed to: ${env} (${currentBaseUrl})`);
   await AsyncStorage.setItem(ENV_STORAGE_KEY, env);
 };
 
+export const updateDevUrl = async (newUrl: string) => {
+  // Ensure it has protocol
+  const formattedUrl = newUrl.startsWith('http') ? newUrl : `http://${newUrl}`;
+  currentDevUrl = formattedUrl;
+
+  if (currentEnv === 'DEV') {
+    currentBaseUrl = formattedUrl;
+  }
+
+  console.log(`[API] Custom DEV URL updated to: ${formattedUrl}`);
+  await AsyncStorage.setItem(DEV_URL_STORAGE_KEY, formattedUrl);
+};
+
+export const getDevUrl = () => currentDevUrl;
+
 export const initEnvironment = async () => {
+  // Load custom DEV URL first
+  const savedDevUrl = await AsyncStorage.getItem(DEV_URL_STORAGE_KEY);
+  if (savedDevUrl) {
+    currentDevUrl = savedDevUrl;
+  }
+
   const savedEnv = await AsyncStorage.getItem(ENV_STORAGE_KEY) as Environment;
   if (savedEnv && ENVIRONMENTS[savedEnv]) {
     currentEnv = savedEnv;
-    currentBaseUrl = ENVIRONMENTS[savedEnv];
+    currentBaseUrl = savedEnv === 'DEV' ? currentDevUrl : ENVIRONMENTS[savedEnv];
   }
   console.log(`[API] Initialized environment: ${currentEnv} (${currentBaseUrl})`);
   return currentEnv;
@@ -103,6 +126,11 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}, time
     ...(options.headers || {}),
   };
 
+  // Si el body es FormData, eliminar Content-Type para que el navegador/RN lo establezca con el boundary correcto
+  if (options.body instanceof FormData) {
+    delete (headers as any)['Content-Type'];
+  }
+
   try {
     console.log(`[API] Fetching: ${url}`);
     const startTime = Date.now();
@@ -117,12 +145,16 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}, time
     console.log(`[API] Response from ${url}: ${response.status} (${elapsed}ms)`);
 
     // Capture debug info if not in production
-    // if (currentEnv !== 'PROD') {
-    const responseClone = response.clone();
+    if (currentEnv !== 'PROD') {
+      try {
+        const responseClone = response.clone();
     responseClone.text().then(text => {
       updateDebugInfo(path, response.status, text);
     }).catch(e => console.warn("[API] Could not clone response for debug", e));
-    // }
+        } catch (e) {
+          console.warn("[API] Error capturing debug info", e);
+        }
+      }
 
     clearTimeout(id);
     return response;

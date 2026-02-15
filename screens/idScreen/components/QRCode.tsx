@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Alert, DimensionValue, View, Text } from "react-native";
+import { Alert, DimensionValue, View, Text, Image } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { UserContext } from "../../../context/UserContext";
 import { apiFetch, getCurrentEnv } from "../../../util/api";
@@ -18,9 +18,11 @@ export function QRCodeView({
 }: IQRCodeView) {
   const [info, setInfo] = useState<any>();
   const { userData } = useContext(UserContext);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     const fetchData = () => {
+      setHasError(false);
       apiFetch(`/armatura/${identification}/qr`, {
         method: "POST",
         headers: {
@@ -29,17 +31,28 @@ export function QRCodeView({
       })
         .then((res) => {
           if (!res.ok) {
-            Alert.alert(
-              "Sesión expirada",
-              "Por favor inicia sesión nuevamente",
-            );
-            navigation.navigate("Login");
+            // If session expired, redirect
+            if (res.status === 401 || res.status === 403) {
+              Alert.alert(
+                "Sesión expirada",
+                "Por favor inicia sesión nuevamente",
+              );
+              navigation.navigate("Login");
+              return null;
+            }
+            // Other errors -> maintenance
+            throw new Error("Server error");
           }
-          return res;
+          return res.text();
         })
-        .then((res) => res.text())
-        .then((text) => setInfo(text))
-        .catch((err) => setInfo("" + err));
+        .then((text) => {
+          if (text) setInfo(text);
+        })
+        .catch((err) => {
+          console.error("QR Fetch Error:", err);
+          setHasError(true);
+          setInfo(null);
+        });
     };
 
     fetchData();
@@ -49,7 +62,33 @@ export function QRCodeView({
 
     return () => clearInterval(interval);
   }, []);
-  if (!info) return <></>;
+
+  if (hasError) {
+    return (
+      <View style={{ paddingTop: paddingTop, alignItems: "center" }}>
+        {/* Maintenance Image - User provided */}
+        <Image
+          source={require("../../../assets/images/maintenance.jpg")}
+          style={{ width: size, height: size, resizeMode: "contain" }}
+        />
+        <Text
+          style={{
+            marginTop: 10,
+            textAlign: "center",
+            color: "red",
+            fontSize: 12,
+            maxWidth: size,
+          }}
+        >
+          El servidor se encuentra en mantenimiento. Si la situación continua
+          por favor envía un correo a contacto@unicauca.edu.co
+        </Text>
+      </View>
+    );
+  }
+
+  if (!info) return <View style={{ width: size, height: size }} />; // Placeholder/Loading
+
   return (
     <View style={{ paddingTop: paddingTop }}>
       <QRCode value={info} size={size} backgroundColor="white" />
