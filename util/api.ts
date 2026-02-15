@@ -70,17 +70,19 @@ export const updateDevUrl = async (newUrl: string) => {
 export const getDevUrl = () => currentDevUrl;
 
 export const initEnvironment = async () => {
-  // Load custom DEV URL first
+  // Load custom DEV URL first (for when dev mode is unlocked)
   const savedDevUrl = await AsyncStorage.getItem(DEV_URL_STORAGE_KEY);
   if (savedDevUrl) {
     currentDevUrl = savedDevUrl;
   }
 
-  const savedEnv = await AsyncStorage.getItem(ENV_STORAGE_KEY) as Environment;
-  if (savedEnv && ENVIRONMENTS[savedEnv]) {
-    currentEnv = savedEnv;
-    currentBaseUrl = savedEnv === 'DEV' ? currentDevUrl : ENVIRONMENTS[savedEnv];
-  }
+  // ALWAYS start in PROD, ignore any saved environment
+  currentEnv = 'PROD';
+  currentBaseUrl = ENVIRONMENTS.PROD;
+
+  // Clear any previously saved environment to enforce fresh PROD start
+  await AsyncStorage.removeItem(ENV_STORAGE_KEY);
+
   console.log(`[API] Initialized environment: ${currentEnv} (${currentBaseUrl})`);
   return currentEnv;
 };
